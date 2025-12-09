@@ -90,7 +90,7 @@ def parse_action_tags(text, show_action_name=False):
         action_name = html.escape(match.group(1))
         content = html.escape(match.group(2))
         if show_action_name:
-            return f'<span class="action-tag"><span class="action-name"><em>{action_name}</em></span><span class="action-content">{content}</span></span>'
+            return f'<span class="action-tag"><span class="action-name">{action_name}</span><span class="action-content">{content}</span></span>'
         else:
             return f'<span class="action-tag"><span class="action-content">{content}</span></span>'
     

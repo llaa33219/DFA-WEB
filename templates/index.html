@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}DFA-Notation-Grammar - 예시{% endblock %}
+
+{% block head %}
+<style>
+    .hero {
+        text-align: center;
+        padding: var(--space-3xl) 0;
+    }
+
+    .hero-title {
+        font-size: 48px;
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: var(--space-md);
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 24px;
+        color: var(--gray-600);
+        margin-bottom: var(--space-2xl);
+    }
+
+    .hero-buttons {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-md);
+        margin-bottom: var(--space-3xl);
+        flex-wrap: wrap;
+    }
+
+    .btn-github {
+        background: var(--gray-900);
+        color: var(--white);
+    }
+
+    .btn-github:hover {
+        background: var(--gray-700);
+    }
+
+    .examples-section {
+        padding: var(--space-2xl) 0 var(--space-3xl);
+    }
+
+    .examples-title {
+        font-size: 32px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: var(--space-2xl);
+        color: var(--gray-800);
+    }
+
+    .examples-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-lg);
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .example-card {
+        text-align: center;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .example-card h3 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary-500);
+        margin-bottom: var(--space-sm);
+    }
+
+    .example-card p {
+        font-size: 16px;
+        color: var(--gray-600);
+    }
+
+    .example-icon {
+        font-size: 48px;
+        margin-bottom: var(--space-md);
+    }
+
+    .login-notice {
+        text-align: center;
+        padding: var(--space-lg);
+        background: var(--primary-50);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-2xl);
+    }
+
+    .login-notice p {
+        color: var(--gray-700);
+        margin-bottom: var(--space-md);
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 32px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+    <section class="hero">
+        <h1 class="hero-title">선언성 자유 형식 표기 행동 문법</h1>
+        <p class="hero-subtitle">Declarative Free-Form Action Notation Grammar</p>
+        
+        <div class="hero-buttons">
+            <a href="https://github.com/llaa33219/DFA-Notation-Grammar" target="_blank" class="btn btn-github btn-lg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+            </a>
+            <a href="https://github.com/llaa33219/" target="_blank" class="btn btn-secondary btn-lg">
+                made by BLOUplanet
+            </a>
+        </div>
+    </section>
+
+    {% if not logged_in %}
+    <div class="login-notice">
+        <p>예시를 사용하려면 Hugging Face 로그인이 필요합니다.</p>
+        <a href="/login" class="btn btn-primary">🤗 Hugging Face로 로그인</a>
+    </div>
+    {% endif %}
+
+    <section class="examples-section">
+        <h2 class="examples-title">예시 선택</h2>
+        
+        <div class="examples-grid">
+            <a href="/chatbot" class="card example-card">
+                <div class="example-icon">💬</div>
+                <h3>Chatbot</h3>
+                <p>감정과 행동 표현이 가능한 챗봇 예시</p>
+            </a>
+            
+            <a href="/avatar" class="card example-card">
+                <div class="example-icon">🧑‍🎨</div>
+                <h3>아바타</h3>
+                <p>행동에 따라 아바타가 반응하는 예시</p>
+            </a>
+            
+            <a href="/robot" class="card example-card">
+                <div class="example-icon">🤖</div>
+                <h3>로봇</h3>
+                <p>로봇 제어 명령을 콘솔로 확인하는 예시</p>
+            </a>
+            
+            <a href="/affinity" class="card example-card">
+                <div class="example-icon">❤️</div>
+                <h3>호감도</h3>
+                <p>대화에 따라 호감도가 변하는 예시</p>
+            </a>
+        </div>
+    </section>
+</main>
+{% endblock %}

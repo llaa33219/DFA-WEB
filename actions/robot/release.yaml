@@ -1,0 +1,6 @@
+type: action
+name: release
+definition: |
+  로봇이 물체를 놓는 행동을 표현합니다.
+  예시: [{release}물체를 내려놓다], [{release}그리퍼 해제]
+  로봇이 잡고 있던 것을 놓을 때 사용합니다.

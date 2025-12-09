@@ -1,0 +1,6 @@
+type: action
+name: surprised
+definition: |
+  놀라거나 의외라는 감정을 표현합니다.
+  예시: [{surprised}놀란 표정으로], [{surprised}깜짝 놀라며]
+  예상치 못한 상황이나 새로운 정보를 접했을 때 사용합니다.

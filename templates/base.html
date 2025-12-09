@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DFA-Notation-Grammar{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'CloudSansCode';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408@1.0/goorm-sans-code.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        :root {
+            /* Colors */
+            --primary-50: #eef6ff;
+            --primary-100: #b9d6fd;
+            --primary-500: #007BFF;
+            --primary-600: #005BDD;
+            --primary-700: #193694;
+            
+            --secondary-50: #e3ffe3;
+            --secondary-500: #00d200;
+            --secondary-600: #00a100;
+            
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e8e8e8;
+            --gray-300: #d6d6d6;
+            --gray-400: #a6a6a6;
+            --gray-500: #757575;
+            --gray-600: #575757;
+            --gray-700: #454545;
+            --gray-800: #2b2b2b;
+            --gray-900: #1c1c1c;
+            
+            --success: #00ef38;
+            --warning: #ffdd00;
+            --error: #df0013;
+            --info: #c9c9c9;
+            
+            /* Typography */
+            --font-primary: 'CloudSansCode', 'Noto Sans KR', sans-serif;
+            --font-mono: 'CloudSansCode', monospace;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+            
+            /* Shadows */
+            --shadow-xs: 8px 8px 0px rgba(0,0,0,0.2);
+            --shadow-sm: 2px 2px 0px rgba(0,0,0,0.2);
+            --shadow-md: 4px 4px 0px rgba(0,0,0,0.2);
+            --shadow-lg: 10px 10px 0px rgba(0,0,0,0.2);
+            
+            /* Border Radius */
+            --radius-sm: 14px;
+            --radius-md: 20px;
+            --radius-lg: 26px;
+            --radius-full: 9999px;
+            
+            /* Transitions */
+            --duration-fast: 0.15s;
+            --duration-normal: 0.3s;
+            --duration-slow: 0.5s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-50);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--white);
+            height: 72px;
+            box-shadow: var(--shadow-xs);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-xl);
+        }
+
+        .navbar-container {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-500);
+            text-decoration: none;
+            transition: color var(--duration-fast) ease;
+        }
+
+        .navbar-logo:hover {
+            color: var(--primary-600);
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .navbar-link {
+            padding: 8px 16px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: color var(--duration-fast) ease;
+            border-radius: var(--radius-sm);
+        }
+
+        .navbar-link:hover {
+            color: var(--primary-500);
+        }
+
+        .navbar-link.active {
+            color: var(--primary-500);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: 10px 20px;
+            font-family: var(--font-primary);
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--duration-normal) ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-500);
+            color: var(--white);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-600);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(6px);
+        }
+
+        .btn-primary:active {
+            background: var(--primary-700);
+            transform: translateY(8px);
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-500);
+            border: 2px solid var(--primary-500);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: var(--shadow-xs);
+            transform: translateY(-8px);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 16px;
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 22px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--duration-slow) ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-10px);
+        }
+
+        .card-highlight {
+            border: 5px solid var(--primary-500);
+        }
+
+        /* Input */
+        .input {
+            width: 100%;
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            font-family: var(--font-primary);
+            font-size: 18px;
+            color: var(--gray-900);
+            transition: all var(--duration-normal) ease;
+        }
+
+        .input:focus {
+            outline: none;
+            box-shadow: var(--shadow-xs);
+            transform: translateY(-8px);
+        }
+
+        .input::placeholder {
+            color: var(--gray-400);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-xl);
+        }
+
+        /* Action Tags Styling */
+        .action-tag {
+            display: inline;
+        }
+
+        .action-content {
+            color: var(--gray-500);
+            font-style: italic;
+        }
+
+        .action-name {
+            color: var(--error);
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .action-name::before {
+            content: '[';
+        }
+
+        .action-name::after {
+            content: ']';
+        }
+
+        /* User info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 var(--space-md);
+            }
+            
+            .container {
+                padding: 0 var(--space-md);
+            }
+
+            .navbar-links {
+                display: none;
+            }
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">DFA-Notation-Grammar</a>
+            <div class="navbar-links">
+                {% if logged_in %}
+                <span class="user-name">{{ username }}</span>
+                <a href="/logout" class="btn btn-secondary btn-sm">로그아웃</a>
+                {% else %}
+                <a href="/login" class="btn btn-primary btn-sm">🤗 Hugging Face 로그인</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    {% block content %}{% endblock %}
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

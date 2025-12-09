@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}오류 - DFA-Notation-Grammar{% endblock %}
+
+{% block head %}
+<style>
+    .error-container {
+        text-align: center;
+        padding: var(--space-3xl) 0;
+    }
+
+    .error-icon {
+        font-size: 72px;
+        margin-bottom: var(--space-lg);
+    }
+
+    .error-title {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--error);
+        margin-bottom: var(--space-md);
+    }
+
+    .error-message {
+        font-size: 18px;
+        color: var(--gray-600);
+        margin-bottom: var(--space-xl);
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <h1 class="error-title">오류가 발생했습니다</h1>
+        <p class="error-message">{{ error }}</p>
+        <a href="/" class="btn btn-primary">홈으로 돌아가기</a>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,6 @@
+type: action
+name: angry
+definition: |
+  화나거나 짜증나는 감정을 표현합니다.
+  예시: [{angry}불쾌한 표정으로], [{angry}화가 나서]
+  부당한 상황이나 불만을 표현할 때 사용합니다.

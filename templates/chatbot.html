@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Chatbot - DFA-Notation-Grammar{% endblock %}
+
+{% block head %}
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: var(--space-xl) auto;
+        padding: 0 var(--space-md);
+    }
+
+    .chat-header {
+        text-align: center;
+        margin-bottom: var(--space-xl);
+    }
+
+    .chat-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: var(--space-sm);
+    }
+
+    .chat-header p {
+        color: var(--gray-600);
+    }
+
+    .chat-box {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        height: 500px;
+        overflow-y: auto;
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+
+    .message {
+        margin-bottom: var(--space-md);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message.user {
+        align-items: flex-end;
+    }
+
+    .message.assistant {
+        align-items: flex-start;
+    }
+
+    .message-content {
+        max-width: 80%;
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+        line-height: 1.6;
+    }
+
+    .message.user .message-content {
+        background: var(--primary-500);
+        color: var(--white);
+    }
+
+    .message.assistant .message-content {
+        background: var(--gray-100);
+        color: var(--gray-800);
+    }
+
+    .message-label {
+        font-size: 12px;
+        color: var(--gray-500);
+        margin-bottom: 4px;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        margin-bottom: var(--space-md);
+    }
+
+    .action-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        background: var(--gray-100);
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all var(--duration-fast) ease;
+    }
+
+    .action-btn:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-500);
+    }
+
+    .action-btn.active {
+        background: var(--primary-500);
+        color: var(--white);
+        border-color: var(--primary-500);
+    }
+
+    .input-area {
+        display: flex;
+        gap: var(--space-md);
+    }
+
+    .input-area .input {
+        flex: 1;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: var(--space-md);
+        color: var(--gray-500);
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .action-content {
+        color: var(--gray-500);
+        font-style: italic;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        color: var(--gray-600);
+        text-decoration: none;
+        margin-bottom: var(--space-lg);
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        color: var(--primary-500);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="chat-container">
+    <a href="/" class="back-link">← 돌아가기</a>
+    
+    <div class="chat-header">
+        <h1>💬 Chatbot 예시</h1>
+        <p>감정과 행동 표현이 가능한 챗봇입니다. 행동 태그 버튼을 눌러 메시지에 행동을 추가할 수 있습니다.</p>
+    </div>
+
+    <div class="action-buttons">
+        <span style="color: var(--gray-600); font-size: 14px; margin-right: 8px;">행동 태그:</span>
+        {% for name, definition in actions.items() %}
+        <button class="action-btn" data-action="{{ name }}" title="{{ definition }}">{{ name }}</button>
+        {% endfor %}
+        <button class="action-btn" data-action="none_action" title="행동 명칭 없이 내용만 표현">none_action</button>
+    </div>
+
+    <div class="chat-box" id="chatBox">
+        <div class="message assistant">
+            <span class="message-label">AI</span>
+            <div class="message-content">
+                안녕하세요! 저는 DFA-Notation-Grammar를 사용하는 챗봇입니다. 무엇을 도와드릴까요?
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <span>AI가 응답을 생성하고 있습니다...</span>
+    </div>
+
+    <div class="input-area">
+        <input type="text" class="input" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
+        <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const messageInput = document.getElementById('messageInput');
+    const loading = document.getElementById('loading');
+    let conversationHistory = [];
+    let selectedAction = null;
+
+    // Action button handling
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.dataset.action;
+            if (selectedAction === action) {
+                selectedAction = null;
+                this.classList.remove('active');
+            } else {
+                document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+                selectedAction = action;
+                this.classList.add('active');
+            }
+        });
+    });
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function addMessage(role, content, rendered = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+        
+        const label = document.createElement('span');
+        label.className = 'message-label';
+        label.textContent = role === 'user' ? '나' : 'AI';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        
+        if (rendered) {
+            contentDiv.innerHTML = rendered;
+        } else {
+            contentDiv.textContent = content;
+        }
+        
+        messageDiv.appendChild(label);
+        messageDiv.appendChild(contentDiv);
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+        let message = messageInput.value.trim();
+        if (!message) return;
+
+        // Add action tag if selected
+        if (selectedAction) {
+            message = `[{${selectedAction}}] ${message}`;
+            // Reset selection
+            document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+            selectedAction = null;
+        }
+
+        messageInput.value = '';
+        addMessage('user', message);
+        conversationHistory.push({ role: 'user', content: message });
+
+        loading.classList.add('show');
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    example_type: 'chatbot',
+                    history: conversationHistory
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+                addMessage('assistant', '오류: ' + data.error);
+            } else {
+                addMessage('assistant', data.response, data.rendered);
+                conversationHistory.push({ role: 'assistant', content: data.response });
+            }
+        } catch (error) {
+            addMessage('assistant', '오류가 발생했습니다: ' + error.message);
+        } finally {
+            loading.classList.remove('show');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+type: action
+name: grab
+definition: |
+  로봇이 물체를 잡는 행동을 표현합니다.
+  예시: [{grab}물체를 집어들다], [{grab}그리퍼로 물건 파지]
+  로봇이 무언가를 잡을 때 사용합니다.

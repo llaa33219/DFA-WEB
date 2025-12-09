@@ -1,0 +1,6 @@
+type: action
+name: move_backward
+definition: |
+  로봇이 후진하는 행동을 표현합니다.
+  예시: [{move_backward}0.5미터 후진], [{move_backward}안전 거리까지 후퇴]
+  로봇을 뒤로 움직일 때 사용합니다.

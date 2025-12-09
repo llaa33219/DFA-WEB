@@ -1,0 +1,6 @@
+type: action
+name: thinking
+definition: |
+  생각하는 행동을 표현합니다.
+  예시: [{thinking}깊이 고민하며], [{thinking}질문을 분석하며]
+  사용자의 질문에 대해 생각하거나 고민할 때 사용합니다.

@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}아바타 - DFA-Notation-Grammar{% endblock %}
+
+{% block head %}
+<style>
+    .avatar-page {
+        display: flex;
+        height: calc(100vh - 72px);
+        position: relative;
+    }
+
+    .avatar-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary-50) 0%, var(--gray-100) 100%);
+        z-index: 1;
+    }
+
+    .avatar-container {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: all 0.5s ease;
+    }
+
+    .avatar-placeholder {
+        width: 200px;
+        height: 280px;
+        background: var(--gray-200);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 80px;
+        transition: all 0.5s ease;
+    }
+
+    .avatar-effect {
+        position: absolute;
+        font-size: 48px;
+        opacity: 0;
+        transition: all 0.5s ease;
+        pointer-events: none;
+    }
+
+    .avatar-effect.show {
+        opacity: 1;
+        animation: floatUp 2s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-50px); opacity: 0; }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .avatar-placeholder.thinking {
+        animation: pulse 1s ease infinite;
+    }
+
+    .avatar-placeholder.happy {
+        animation: bounce 0.5s ease;
+    }
+
+    .avatar-placeholder.sad {
+        filter: grayscale(50%);
+    }
+
+    .avatar-placeholder.angry {
+        animation: shake 0.3s ease infinite;
+        filter: hue-rotate(330deg);
+    }
+
+    .avatar-placeholder.move {
+        animation: bounce 0.8s ease;
+    }
+
+    .chat-panel {
+        position: relative;
+        z-index: 10;
+        width: 400px;
+        margin: var(--space-lg);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-header {
+        margin-bottom: var(--space-md);
+    }
+
+    .chat-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: var(--space-xs);
+    }
+
+    .chat-header p {
+        font-size: 14px;
+        color: var(--gray-600);
+    }
+
+    .chat-box {
+        flex: 1;
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow-y: auto;
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+
+    .message {
+        margin-bottom: var(--space-sm);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message.user {
+        align-items: flex-end;
+    }
+
+    .message.assistant {
+        align-items: flex-start;
+    }
+
+    .message-content {
+        max-width: 90%;
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .message.user .message-content {
+        background: var(--primary-500);
+        color: var(--white);
+    }
+
+    .message.assistant .message-content {
+        background: var(--gray-100);
+        color: var(--gray-800);
+    }
+
+    .message-label {
+        font-size: 11px;
+        color: var(--gray-500);
+        margin-bottom: 2px;
+    }
+
+    .input-area {
+        display: flex;
+        gap: var(--space-sm);
+    }
+
+    .input-area .input {
+        flex: 1;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .input-area .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: var(--space-sm);
+        color: var(--gray-500);
+        font-size: 14px;
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .action-content {
+        color: var(--gray-500);
+        font-style: italic;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        color: var(--gray-600);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: var(--space-sm);
+    }
+
+    .back-link:hover {
+        color: var(--primary-500);
+    }
+
+    @media (max-width: 768px) {
+        .avatar-page {
+            flex-direction: column;
+        }
+
+        .chat-panel {
+            width: 100%;
+            margin: var(--space-md);
+        }
+
+        .avatar-background {
+            position: relative;
+            height: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="avatar-page">
+    <div class="avatar-background">
+        <div class="avatar-container">
+            <div class="avatar-placeholder" id="avatar">🧑‍🎨</div>
+            <div class="avatar-effect" id="avatarEffect"></div>
+        </div>
+    </div>
+
+    <div class="chat-panel">
+        <a href="/" class="back-link">← 돌아가기</a>
+        
+        <div class="chat-header">
+            <h1>🧑‍🎨 아바타 예시</h1>
+            <p>AI의 행동에 따라 아바타가 반응합니다</p>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+            <div class="message assistant">
+                <span class="message-label">AI</span>
+                <div class="message-content">
+                    안녕하세요! 저와 대화하면 제 감정과 행동이 아바타에 표현됩니다.
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <span>응답 생성 중...</span>
+        </div>
+
+        <div class="input-area">
+            <input type="text" class="input" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
+            <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const messageInput = document.getElementById('messageInput');
+    const loading = document.getElementById('loading');
+    const avatar = document.getElementById('avatar');
+    const avatarEffect = document.getElementById('avatarEffect');
+    let conversationHistory = [];
+
+    const actionEffects = {
+        'thinking': { emoji: '💭', animation: 'thinking' },
+        'happy': { emoji: '😊', animation: 'happy' },
+        'sad': { emoji: '😢', animation: 'sad' },
+        'angry': { emoji: '😠', animation: 'angry' },
+        'surprised': { emoji: '😲', animation: 'bounce' },
+        'move': { emoji: '🚶', animation: 'move' },
+        'wave': { emoji: '👋', animation: 'bounce' },
+        'nod': { emoji: '✓', animation: 'bounce' },
+        'laugh': { emoji: '😂', animation: 'happy' }
+    };
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function addMessage(role, content, rendered = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+        
+        const label = document.createElement('span');
+        label.className = 'message-label';
+        label.textContent = role === 'user' ? '나' : 'AI';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        
+        if (rendered) {
+            contentDiv.innerHTML = rendered;
+        } else {
+            contentDiv.textContent = content;
+        }
+        
+        messageDiv.appendChild(label);
+        messageDiv.appendChild(contentDiv);
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function applyAvatarEffect(actions) {
+        // Reset avatar
+        avatar.className = 'avatar-placeholder';
+        
+        if (actions && actions.length > 0) {
+            actions.forEach((action, index) => {
+                setTimeout(() => {
+                    const effect = actionEffects[action.action];
+                    if (effect) {
+                        // Apply animation
+                        avatar.classList.add(effect.animation);
+                        
+                        // Show floating emoji
+                        avatarEffect.textContent = effect.emoji;
+                        avatarEffect.className = 'avatar-effect show';
+                        
+                        setTimeout(() => {
+                            avatarEffect.className = 'avatar-effect';
+                        }, 2000);
+                    }
+                }, index * 1000);
+            });
+        }
+    }
+
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        messageInput.value = '';
+        addMessage('user', message);
+        conversationHistory.push({ role: 'user', content: message });
+
+        loading.classList.add('show');
+        avatar.classList.add('thinking');
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    example_type: 'avatar',
+                    history: conversationHistory
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+                addMessage('assistant', '오류: ' + data.error);
+            } else {
+                addMessage('assistant', data.response, data.rendered);
+                conversationHistory.push({ role: 'assistant', content: data.response });
+                applyAvatarEffect(data.actions);
+            }
+        } catch (error) {
+            addMessage('assistant', '오류가 발생했습니다: ' + error.message);
+        } finally {
+            loading.classList.remove('show');
+            avatar.classList.remove('thinking');
+        }
+    }
+</script>
+{% endblock %}

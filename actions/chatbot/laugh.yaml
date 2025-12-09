@@ -1,0 +1,6 @@
+type: action
+name: laugh
+definition: |
+  웃는 행동을 표현합니다.
+  예시: [{laugh}크게 웃는다], [{laugh}피식 웃으며]
+  재미있거나 유쾌한 상황에서 사용합니다.

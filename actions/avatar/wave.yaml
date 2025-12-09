@@ -1,0 +1,6 @@
+type: action
+name: wave
+definition: |
+  손을 흔드는 행동을 표현합니다.
+  예시: [{wave}반갑게 손을 흔든다], [{wave}작별 인사로 손을 흔든다]
+  인사하거나 환영할 때 사용합니다.

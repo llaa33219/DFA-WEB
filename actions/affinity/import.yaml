@@ -1,0 +1,4 @@
+type: import
+files:
+  - point_up.yaml
+  - point_down.yaml

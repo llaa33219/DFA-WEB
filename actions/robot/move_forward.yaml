@@ -1,0 +1,6 @@
+type: action
+name: move_forward
+definition: |
+  로봇이 전진하는 행동을 표현합니다.
+  예시: [{move_forward}1미터 전진], [{move_forward}목표 지점으로 이동]
+  로봇을 앞으로 움직일 때 사용합니다.

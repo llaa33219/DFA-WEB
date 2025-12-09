@@ -1,0 +1,6 @@
+type: action
+name: turn_left
+definition: |
+  로봇이 왼쪽으로 회전하는 행동을 표현합니다.
+  예시: [{turn_left}90도 좌회전], [{turn_left}왼쪽으로 방향 전환]
+  로봇의 방향을 왼쪽으로 바꿀 때 사용합니다.

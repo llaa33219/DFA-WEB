@@ -1,0 +1,10 @@
+type: import
+files:
+  - move_forward.yaml
+  - move_backward.yaml
+  - turn_left.yaml
+  - turn_right.yaml
+  - stop.yaml
+  - grab.yaml
+  - release.yaml
+  - scan.yaml

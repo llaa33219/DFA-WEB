@@ -1,0 +1,11 @@
+type: import
+files:
+  - thinking.yaml
+  - happy.yaml
+  - sad.yaml
+  - angry.yaml
+  - surprised.yaml
+  - move.yaml
+  - wave.yaml
+  - nod.yaml
+  - laugh.yaml

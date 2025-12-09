@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}로봇 - DFA-Notation-Grammar{% endblock %}
+
+{% block head %}
+<style>
+    .robot-page {
+        display: flex;
+        height: calc(100vh - 72px);
+        padding: var(--space-lg);
+        gap: var(--space-lg);
+    }
+
+    .chat-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .console-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-header {
+        margin-bottom: var(--space-md);
+    }
+
+    .panel-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: var(--space-xs);
+    }
+
+    .panel-header p {
+        font-size: 14px;
+        color: var(--gray-600);
+    }
+
+    .chat-box {
+        flex: 1;
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow-y: auto;
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+
+    .console-box {
+        flex: 1;
+        background: var(--gray-900);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow-y: auto;
+        padding: var(--space-md);
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--secondary-500);
+    }
+
+    .console-line {
+        margin-bottom: var(--space-sm);
+        line-height: 1.5;
+    }
+
+    .console-line .timestamp {
+        color: var(--gray-500);
+        margin-right: var(--space-sm);
+    }
+
+    .console-line .action-type {
+        color: var(--warning);
+        font-weight: 600;
+    }
+
+    .console-line .action-content {
+        color: var(--white);
+    }
+
+    .console-line.sent {
+        color: var(--success);
+    }
+
+    .console-line.error {
+        color: var(--error);
+    }
+
+    .message {
+        margin-bottom: var(--space-sm);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message.user {
+        align-items: flex-end;
+    }
+
+    .message.assistant {
+        align-items: flex-start;
+    }
+
+    .message-content {
+        max-width: 90%;
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .message.user .message-content {
+        background: var(--primary-500);
+        color: var(--white);
+    }
+
+    .message.assistant .message-content {
+        background: var(--gray-100);
+        color: var(--gray-800);
+    }
+
+    .message-label {
+        font-size: 11px;
+        color: var(--gray-500);
+        margin-bottom: 2px;
+    }
+
+    .input-area {
+        display: flex;
+        gap: var(--space-sm);
+    }
+
+    .input-area .input {
+        flex: 1;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .input-area .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: var(--space-sm);
+        color: var(--gray-500);
+        font-size: 14px;
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .action-content {
+        color: var(--gray-500);
+        font-style: italic;
+    }
+
+    .action-name {
+        color: var(--error);
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        color: var(--gray-600);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: var(--space-sm);
+    }
+
+    .back-link:hover {
+        color: var(--primary-500);
+    }
+
+    @media (max-width: 768px) {
+        .robot-page {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="robot-page">
+    <div class="chat-panel">
+        <a href="/" class="back-link">← 돌아가기</a>
+        
+        <div class="panel-header">
+            <h2>🤖 로봇 제어 채팅</h2>
+            <p>AI와 대화하면 로봇 제어 명령이 콘솔에 표시됩니다</p>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+            <div class="message assistant">
+                <span class="message-label">AI</span>
+                <div class="message-content">
+                    안녕하세요! 저는 로봇 제어 시스템입니다. 명령을 내려주시면 해당 액션을 수행합니다.
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <span>응답 생성 중...</span>
+        </div>
+
+        <div class="input-area">
+            <input type="text" class="input" id="messageInput" placeholder="명령을 입력하세요..." onkeypress="handleKeyPress(event)">
+            <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+
+    <div class="console-panel">
+        <div class="panel-header">
+            <h2>📟 로봇 콘솔</h2>
+            <p>로봇에게 전송된 액션 명령 로그</p>
+        </div>
+
+        <div class="console-box" id="consoleBox">
+            <div class="console-line">
+                <span class="timestamp">[시스템]</span>
+                <span class="action-content">로봇 콘솔이 초기화되었습니다.</span>
+            </div>
+            <div class="console-line">
+                <span class="timestamp">[시스템]</span>
+                <span class="action-content">명령 대기 중...</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const consoleBox = document.getElementById('consoleBox');
+    const messageInput = document.getElementById('messageInput');
+    const loading = document.getElementById('loading');
+    let conversationHistory = [];
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function getTimestamp() {
+        const now = new Date();
+        return now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function addConsoleLog(type, action, content, status = 'sent') {
+        const line = document.createElement('div');
+        line.className = `console-line ${status}`;
+        
+        if (action) {
+            line.innerHTML = `
+                <span class="timestamp">[${getTimestamp()}]</span>
+                <span class="action-type">${action}</span>
+                <span class="action-content"> → ${content}</span>
+            `;
+        } else {
+            line.innerHTML = `
+                <span class="timestamp">[${getTimestamp()}]</span>
+                <span class="action-content">${content}</span>
+            `;
+        }
+        
+        consoleBox.appendChild(line);
+        consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    function addMessage(role, content, rendered = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+        
+        const label = document.createElement('span');
+        label.className = 'message-label';
+        label.textContent = role === 'user' ? '나' : 'AI';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        
+        if (rendered) {
+            contentDiv.innerHTML = rendered;
+        } else {
+            contentDiv.textContent = content;
+        }
+        
+        messageDiv.appendChild(label);
+        messageDiv.appendChild(contentDiv);
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function processRobotActions(actions) {
+        if (actions && actions.length > 0) {
+            actions.forEach((action, index) => {
+                setTimeout(() => {
+                    addConsoleLog('action', action.action.toUpperCase(), action.content, 'sent');
+                    
+                    // Simulate sending to robot
+                    setTimeout(() => {
+                        addConsoleLog('', null, `[${action.action}] 명령 전송 완료`, 'sent');
+                    }, 300);
+                }, index * 500);
+            });
+        }
+    }
+
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        messageInput.value = '';
+        addMessage('user', message);
+        conversationHistory.push({ role: 'user', content: message });
+        addConsoleLog('', null, `사용자 명령 수신: "${message}"`);
+
+        loading.classList.add('show');
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    example_type: 'robot',
+                    history: conversationHistory
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+                addMessage('assistant', '오류: ' + data.error);
+                addConsoleLog('', null, '오류: ' + data.error, 'error');
+            } else {
+                addMessage('assistant', data.response, data.rendered);
+                conversationHistory.push({ role: 'assistant', content: data.response });
+                processRobotActions(data.actions);
+            }
+        } catch (error) {
+            addMessage('assistant', '오류가 발생했습니다: ' + error.message);
+            addConsoleLog('', null, '통신 오류: ' + error.message, 'error');
+        } finally {
+            loading.classList.remove('show');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+type: action
+name: stop
+definition: |
+  로봇이 정지하는 행동을 표현합니다.
+  예시: [{stop}즉시 정지], [{stop}모든 동작 중단]
+  로봇을 멈출 때 사용합니다.

@@ -1,0 +1,6 @@
+type: action
+name: happy
+definition: |
+  기쁨이나 행복한 감정을 표현합니다.
+  예시: [{happy}환하게 미소 짓는다], [{happy}기쁜 마음으로]
+  긍정적인 상황이나 좋은 소식을 전할 때 사용합니다.

@@ -162,17 +162,18 @@
     <a href="/" class="back-link">← 돌아가기</a>
     
     <div class="chat-header">
-        <h1>💬 Chatbot 예시</h1>
-        <p>감정과 행동 표현이 가능한 챗봇입니다.</p>
+        <h1>Chatbot</h1>
+        <p>DFA-NG</p>
     </div>
 
     <div class="action-info">
-        <div class="action-info-title">💡 행동 태그 사용법</div>
+        <div class="action-info-title">💡 행동 명칭 사용법</div>
         <div class="action-info-desc">
             • <code>[내용]</code> 형식으로 입력하면 자동으로 <code>[{none_action}내용]</code>으로 변환됩니다.<br>
-            • <code>[{행동태그}내용]</code> 형식으로 직접 입력할 수도 있습니다.
+            • <code>{none_action}</code>은 하나로 정해지지 않고 모든 곳에 사용할 수 있는 행동 명칭을 의미합니다.<br>
+            • <code>[{행동 명칭}내용]</code> 형식으로 직접 입력할 수도 있습니다.
         </div>
-        <div class="action-info-title" style="margin-top: var(--space-sm);">사용 가능한 행동 태그</div>
+        <div class="action-info-title" style="margin-top: var(--space-sm);">사용 가능한 행동 명칭</div>
         <div class="action-tags-list">
             {% for name, definition in actions.items() %}
             <span class="action-tag-item" title="{{ definition }}">{{ name }}</span>
@@ -185,7 +186,7 @@
         <div class="message assistant">
             <span class="message-label">AI</span>
             <div class="message-content">
-                안녕하세요! 저는 DFA-Notation-Grammar를 사용하는 챗봇입니다. 무엇을 도와드릴까요?
+                안녕하세요! 저는 DFA-Notation-Grammar를 사용하는 챗봇입니다. 자유롭게 대화를 시작해 보세요!
             </div>
         </div>
     </div>

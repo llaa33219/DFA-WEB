@@ -137,6 +137,10 @@
         font-style: italic;
     }
 
+    .message.user .action-content {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
     .back-link {
         display: inline-flex;
         align-items: center;
@@ -205,21 +209,10 @@
     let conversationHistory = [];
 
     function processActionTags(message) {
-        // Check if already has full action tag format [{action}content]
-        const fullPattern = /^\[\{(\w+)\}(.+)\]$/;
-        if (fullPattern.test(message)) {
-            return message;
-        }
-        
-        // Check if has simple bracket format [content]
-        const simplePattern = /^\[(.+)\]$/;
-        const simpleMatch = message.match(simplePattern);
-        if (simpleMatch) {
-            return `[{none_action}${simpleMatch[1]}]`;
-        }
-        
-        // Plain message without brackets
-        return message;
+        // Replace all [content] patterns (not already [{action}content]) with [{none_action}content]
+        // This handles: [내용] -> [{none_action}내용]
+        // But preserves: [{action}내용] as is
+        return message.replace(/\[(?!\{)([^\]]+)\]/g, '[{none_action}$1]');
     }
 
     function handleKeyPress(e) {
@@ -249,6 +242,15 @@
         messageDiv.appendChild(contentDiv);
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
+        
+        return messageDiv;
+    }
+
+    function updateMessageRendered(messageDiv, rendered) {
+        const contentDiv = messageDiv.querySelector('.message-content');
+        if (contentDiv && rendered) {
+            contentDiv.innerHTML = rendered;
+        }
     }
 
     async function sendMessage() {
@@ -259,7 +261,8 @@
         message = processActionTags(message);
 
         messageInput.value = '';
-        addMessage('user', message);
+        // Add user message (will be rendered after API response)
+        const userMsgElement = addMessage('user', message, null);
         conversationHistory.push({ role: 'user', content: message });
 
         loading.classList.add('show');
@@ -286,6 +289,10 @@
                 }
                 addMessage('assistant', '오류: ' + data.error);
             } else {
+                // Update user message with rendered version
+                if (data.user_rendered) {
+                    updateMessageRendered(userMsgElement, data.user_rendered);
+                }
                 addMessage('assistant', data.response, data.rendered);
                 conversationHistory.push({ role: 'assistant', content: data.response });
             }

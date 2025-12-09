@@ -308,9 +308,13 @@ def chat():
         # Render the response with markdown and action tags
         rendered_response = render_message(ai_response, show_action_name)
         
+        # Render user message as well (for action tag styling)
+        user_rendered = render_message(user_message, show_action_name)
+        
         return jsonify({
             'response': ai_response,
             'rendered': rendered_response,
+            'user_rendered': user_rendered,
             'actions': extracted_actions
         })
         

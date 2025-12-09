@@ -24,7 +24,7 @@ HF_TOKEN_URL = 'https://huggingface.co/oauth/token'
 HF_API_URL = 'https://router.huggingface.co/v1/chat/completions'
 
 # Default model for inference
-DEFAULT_MODEL = os.environ.get('HF_MODEL', 'mistralai/Mistral-7B-Instruct-v0.3')
+DEFAULT_MODEL = os.environ.get('HF_MODEL', 'deepseek-ai/DeepSeek-V3.2')
 
 
 def load_actions(example_type):
@@ -90,7 +90,7 @@ def parse_action_tags(text, show_action_name=False):
         action_name = html.escape(match.group(1))
         content = html.escape(match.group(2))
         if show_action_name:
-            return f'<span class="action-tag"><span class="action-name">{action_name}</span><span class="action-content">{content}</span></span>'
+            return f'<span class="action-tag"><span class="action-name"><em>{action_name}</em></span><span class="action-content">{content}</span></span>'
         else:
             return f'<span class="action-tag"><span class="action-content">{content}</span></span>'
     

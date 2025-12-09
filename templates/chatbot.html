@@ -74,32 +74,42 @@
         margin-bottom: 4px;
     }
 
-    .action-buttons {
+    .action-info {
+        background: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+
+    .action-info-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: var(--space-sm);
+    }
+
+    .action-info-desc {
+        font-size: 13px;
+        color: var(--gray-600);
+        margin-bottom: var(--space-sm);
+        line-height: 1.5;
+    }
+
+    .action-tags-list {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--space-sm);
-        margin-bottom: var(--space-md);
+        gap: var(--space-xs);
     }
 
-    .action-btn {
-        padding: 6px 12px;
-        font-size: 14px;
-        background: var(--gray-100);
+    .action-tag-item {
+        padding: 4px 10px;
+        font-size: 13px;
+        background: var(--white);
         border: 1px solid var(--gray-300);
         border-radius: var(--radius-sm);
-        cursor: pointer;
-        transition: all var(--duration-fast) ease;
-    }
-
-    .action-btn:hover {
-        background: var(--primary-50);
-        border-color: var(--primary-500);
-    }
-
-    .action-btn.active {
-        background: var(--primary-500);
-        color: var(--white);
-        border-color: var(--primary-500);
+        color: var(--gray-700);
+        font-family: var(--font-mono);
     }
 
     .input-area {
@@ -149,15 +159,22 @@
     
     <div class="chat-header">
         <h1>💬 Chatbot 예시</h1>
-        <p>감정과 행동 표현이 가능한 챗봇입니다. 행동 태그 버튼을 눌러 메시지에 행동을 추가할 수 있습니다.</p>
+        <p>감정과 행동 표현이 가능한 챗봇입니다.</p>
     </div>
 
-    <div class="action-buttons">
-        <span style="color: var(--gray-600); font-size: 14px; margin-right: 8px;">행동 태그:</span>
-        {% for name, definition in actions.items() %}
-        <button class="action-btn" data-action="{{ name }}" title="{{ definition }}">{{ name }}</button>
-        {% endfor %}
-        <button class="action-btn" data-action="none_action" title="행동 명칭 없이 내용만 표현">none_action</button>
+    <div class="action-info">
+        <div class="action-info-title">💡 행동 태그 사용법</div>
+        <div class="action-info-desc">
+            • <code>[내용]</code> 형식으로 입력하면 자동으로 <code>[{none_action}내용]</code>으로 변환됩니다.<br>
+            • <code>[{행동태그}내용]</code> 형식으로 직접 입력할 수도 있습니다.
+        </div>
+        <div class="action-info-title" style="margin-top: var(--space-sm);">사용 가능한 행동 태그</div>
+        <div class="action-tags-list">
+            {% for name, definition in actions.items() %}
+            <span class="action-tag-item" title="{{ definition }}">{{ name }}</span>
+            {% endfor %}
+            <span class="action-tag-item" title="행동 명칭 없이 내용만 표현">none_action</span>
+        </div>
     </div>
 
     <div class="chat-box" id="chatBox">
@@ -186,22 +203,24 @@
     const messageInput = document.getElementById('messageInput');
     const loading = document.getElementById('loading');
     let conversationHistory = [];
-    let selectedAction = null;
 
-    // Action button handling
-    document.querySelectorAll('.action-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const action = this.dataset.action;
-            if (selectedAction === action) {
-                selectedAction = null;
-                this.classList.remove('active');
-            } else {
-                document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
-                selectedAction = action;
-                this.classList.add('active');
-            }
-        });
-    });
+    function processActionTags(message) {
+        // Check if already has full action tag format [{action}content]
+        const fullPattern = /^\[\{(\w+)\}(.+)\]$/;
+        if (fullPattern.test(message)) {
+            return message;
+        }
+        
+        // Check if has simple bracket format [content]
+        const simplePattern = /^\[(.+)\]$/;
+        const simpleMatch = message.match(simplePattern);
+        if (simpleMatch) {
+            return `[{none_action}${simpleMatch[1]}]`;
+        }
+        
+        // Plain message without brackets
+        return message;
+    }
 
     function handleKeyPress(e) {
         if (e.key === 'Enter') {
@@ -236,13 +255,8 @@
         let message = messageInput.value.trim();
         if (!message) return;
 
-        // Add action tag if selected
-        if (selectedAction) {
-            message = `[{${selectedAction}}] ${message}`;
-            // Reset selection
-            document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
-            selectedAction = null;
-        }
+        // Process action tags
+        message = processActionTags(message);
 
         messageInput.value = '';
         addMessage('user', message);

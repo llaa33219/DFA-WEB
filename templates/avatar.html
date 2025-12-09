@@ -228,6 +228,43 @@
         color: var(--primary-500);
     }
 
+    .action-info {
+        background: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: var(--space-sm) var(--space-md);
+        margin-bottom: var(--space-md);
+        font-size: 12px;
+    }
+
+    .action-info-title {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 4px;
+    }
+
+    .action-info-desc {
+        color: var(--gray-600);
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+
+    .action-tags-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .action-tag-item {
+        padding: 2px 8px;
+        font-size: 11px;
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-sm);
+        color: var(--gray-700);
+        font-family: var(--font-mono);
+    }
+
     @media (max-width: 768px) {
         .avatar-page {
             flex-direction: column;
@@ -261,6 +298,19 @@
         <div class="chat-header">
             <h1>🧑‍🎨 아바타 예시</h1>
             <p>AI의 행동에 따라 아바타가 반응합니다</p>
+        </div>
+
+        <div class="action-info">
+            <div class="action-info-title">💡 행동 태그 사용법</div>
+            <div class="action-info-desc">
+                <code>[내용]</code> → <code>[{none_action}내용]</code> | <code>[{행동태그}내용]</code> 직접 입력 가능
+            </div>
+            <div class="action-tags-list">
+                {% for name, definition in actions.items() %}
+                <span class="action-tag-item" title="{{ definition }}">{{ name }}</span>
+                {% endfor %}
+                <span class="action-tag-item" title="행동 명칭 없이 내용만 표현">none_action</span>
+            </div>
         </div>
 
         <div class="chat-box" id="chatBox">
@@ -304,6 +354,24 @@
         'nod': { emoji: '✓', animation: 'bounce' },
         'laugh': { emoji: '😂', animation: 'happy' }
     };
+
+    function processActionTags(message) {
+        // Check if already has full action tag format [{action}content]
+        const fullPattern = /^\[\{(\w+)\}(.+)\]$/;
+        if (fullPattern.test(message)) {
+            return message;
+        }
+        
+        // Check if has simple bracket format [content]
+        const simplePattern = /^\[(.+)\]$/;
+        const simpleMatch = message.match(simplePattern);
+        if (simpleMatch) {
+            return `[{none_action}${simpleMatch[1]}]`;
+        }
+        
+        // Plain message without brackets
+        return message;
+    }
 
     function handleKeyPress(e) {
         if (e.key === 'Enter') {
@@ -360,8 +428,11 @@
     }
 
     async function sendMessage() {
-        const message = messageInput.value.trim();
+        let message = messageInput.value.trim();
         if (!message) return;
+
+        // Process action tags
+        message = processActionTags(message);
 
         messageInput.value = '';
         addMessage('user', message);

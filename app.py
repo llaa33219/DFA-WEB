@@ -208,7 +208,7 @@ def logout():
 def chatbot():
     """Chatbot example page."""
     actions = load_actions('chatbot')
-    return render_template('chatbot.html', actions=actions, username=session.get('username', ''))
+    return render_template('chatbot.html', actions=actions, username=session.get('username', ''), logged_in=True)
 
 
 @app.route('/avatar')
@@ -216,7 +216,7 @@ def chatbot():
 def avatar():
     """Avatar example page."""
     actions = load_actions('avatar')
-    return render_template('avatar.html', actions=actions, username=session.get('username', ''))
+    return render_template('avatar.html', actions=actions, username=session.get('username', ''), logged_in=True)
 
 
 @app.route('/robot')
@@ -224,7 +224,7 @@ def avatar():
 def robot():
     """Robot example page."""
     actions = load_actions('robot')
-    return render_template('robot.html', actions=actions, username=session.get('username', ''))
+    return render_template('robot.html', actions=actions, username=session.get('username', ''), logged_in=True)
 
 
 @app.route('/affinity')
@@ -232,7 +232,7 @@ def robot():
 def affinity():
     """Affinity/Favorability example page."""
     actions = load_actions('affinity')
-    return render_template('affinity.html', actions=actions, username=session.get('username', ''))
+    return render_template('affinity.html', actions=actions, username=session.get('username', ''), logged_in=True)
 
 
 @app.route('/api/chat', methods=['POST'])

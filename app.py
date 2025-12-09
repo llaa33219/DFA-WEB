@@ -21,7 +21,7 @@ HF_CLIENT_SECRET = os.environ.get('HF_CLIENT_SECRET', '')
 HF_REDIRECT_URI = os.environ.get('HF_REDIRECT_URI', 'http://localhost:5000/callback')
 HF_AUTH_URL = 'https://huggingface.co/oauth/authorize'
 HF_TOKEN_URL = 'https://huggingface.co/oauth/token'
-HF_API_URL = 'https://api-inference.huggingface.co/models/'
+HF_API_URL = 'https://router.huggingface.co/v1/chat/completions'
 
 # Default model for inference
 DEFAULT_MODEL = os.environ.get('HF_MODEL', 'mistralai/Mistral-7B-Instruct-v0.3')
@@ -254,42 +254,30 @@ def chat():
     actions = load_actions(example_type)
     system_prompt = build_system_prompt(actions)
     
-    # Build conversation for the model
+    # Build conversation for the model (OpenAI-compatible format)
     messages = [{"role": "system", "content": system_prompt}]
     for msg in conversation_history[-10:]:  # Keep last 10 messages for context
         messages.append({"role": msg['role'], "content": msg['content']})
     messages.append({"role": "user", "content": user_message})
     
-    # Format for Mistral instruction format
-    formatted_prompt = "<s>"
-    for msg in messages:
-        if msg['role'] == 'system':
-            formatted_prompt += f"[INST] {msg['content']} [/INST]"
-        elif msg['role'] == 'user':
-            formatted_prompt += f"[INST] {msg['content']} [/INST]"
-        elif msg['role'] == 'assistant':
-            formatted_prompt += f" {msg['content']}</s><s>"
-    
-    # Call Hugging Face Inference API
+    # Call Hugging Face Inference API (OpenAI-compatible endpoint)
     headers = {
         'Authorization': f"Bearer {session['access_token']}",
         'Content-Type': 'application/json'
     }
     
     payload = {
-        'inputs': formatted_prompt,
-        'parameters': {
-            'max_new_tokens': 500,
-            'temperature': 0.7,
-            'top_p': 0.9,
-            'do_sample': True,
-            'return_full_text': False
-        }
+        'model': DEFAULT_MODEL,
+        'messages': messages,
+        'max_tokens': 500,
+        'temperature': 0.7,
+        'top_p': 0.9,
+        'stream': False
     }
     
     try:
         response = requests.post(
-            f"{HF_API_URL}{DEFAULT_MODEL}",
+            HF_API_URL,
             headers=headers,
             json=payload,
             timeout=60
@@ -302,8 +290,9 @@ def chat():
         response.raise_for_status()
         result = response.json()
         
-        if isinstance(result, list) and len(result) > 0:
-            ai_response = result[0].get('generated_text', '')
+        # Parse OpenAI-compatible response format
+        if 'choices' in result and len(result['choices']) > 0:
+            ai_response = result['choices'][0].get('message', {}).get('content', '')
         else:
             ai_response = str(result)
         

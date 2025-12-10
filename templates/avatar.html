@@ -3,12 +3,14 @@
 {% block title %}아바타 - DFA-Notation-Grammar{% endblock %}
 
 {% block head %}
-<!-- Live2D Cubism Core -->
+<!-- Live2D Cubism 2 Runtime (for older models like Shizuku) -->
+<script src="https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js"></script>
+<!-- Live2D Cubism 4 Core (for newer models) -->
 <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
 <!-- PixiJS v6 (compatible with pixi-live2d-display) -->
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js"></script>
-<!-- pixi-live2d-display (using unpkg for correct MIME type) -->
-<script src="https://unpkg.com/pixi-live2d-display@0.4.0/dist/index.min.js"></script>
+<!-- pixi-live2d-display -->
+<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/index.min.js"></script>
 <style>
     .avatar-page {
         display: flex;

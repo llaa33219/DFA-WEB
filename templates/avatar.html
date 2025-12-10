@@ -3,6 +3,12 @@
 {% block title %}아바타 - DFA-Notation-Grammar{% endblock %}
 
 {% block head %}
+<!-- Live2D Cubism Core -->
+<script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+<!-- PixiJS v6 (compatible with pixi-live2d-display) -->
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js"></script>
+<!-- pixi-live2d-display -->
+<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.2/dist/index.min.js"></script>
 <style>
     .avatar-page {
         display: flex;
@@ -25,38 +31,60 @@
 
     .avatar-container {
         position: relative;
-        width: 300px;
-        height: 400px;
+        width: 400px;
+        height: 500px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
     }
 
-    .avatar-image {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        transition: all 0.5s ease;
-    }
-
-    .avatar-placeholder {
-        width: 200px;
-        height: 280px;
-        background: var(--gray-200);
+    #live2d-canvas {
+        width: 400px;
+        height: 450px;
         border-radius: var(--radius-lg);
+        background: linear-gradient(180deg, #f0f4ff 0%, #e8f0ff 100%);
+        box-shadow: var(--shadow-md);
+        cursor: pointer;
+    }
+
+    .avatar-status {
+        margin-top: var(--space-md);
+        padding: var(--space-sm) var(--space-md);
+        background: var(--white);
+        border-radius: var(--radius-full);
+        box-shadow: var(--shadow-sm);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--gray-700);
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 80px;
-        transition: all 0.5s ease;
+        gap: var(--space-sm);
+        transition: all 0.3s ease;
+    }
+
+    .avatar-status .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: pulse-dot 2s ease infinite;
+    }
+
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
     }
 
     .avatar-effect {
         position: absolute;
+        top: 30px;
+        right: 20px;
         font-size: 48px;
         opacity: 0;
         transition: all 0.5s ease;
         pointer-events: none;
+        z-index: 100;
     }
 
     .avatar-effect.show {
@@ -65,45 +93,53 @@
     }
 
     @keyframes floatUp {
-        0% { transform: translateY(0); opacity: 1; }
-        100% { transform: translateY(-50px); opacity: 0; }
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
     }
 
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
+    .avatar-badge {
+        position: absolute;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        color: var(--gray-400);
+        white-space: nowrap;
+        background: rgba(255,255,255,0.8);
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
     }
 
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-20px); }
+    .avatar-badge a {
+        color: var(--gray-500);
+        text-decoration: none;
     }
 
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
+    .avatar-badge a:hover {
+        text-decoration: underline;
     }
 
-    .avatar-placeholder.thinking {
-        animation: pulse 1s ease infinite;
+    .avatar-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: var(--gray-500);
     }
 
-    .avatar-placeholder.happy {
-        animation: bounce 0.5s ease;
+    .avatar-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--gray-200);
+        border-top-color: var(--primary-500);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto var(--space-sm);
     }
 
-    .avatar-placeholder.sad {
-        filter: grayscale(50%);
-    }
-
-    .avatar-placeholder.angry {
-        animation: shake 0.3s ease infinite;
-        filter: hue-rotate(330deg);
-    }
-
-    .avatar-placeholder.move {
-        animation: bounce 0.8s ease;
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 
     .chat-panel {
@@ -277,7 +313,17 @@
 
         .avatar-background {
             position: relative;
-            height: 200px;
+            height: 350px;
+        }
+
+        .avatar-container {
+            width: 280px;
+            height: 320px;
+        }
+
+        #live2d-canvas {
+            width: 280px;
+            height: 300px;
         }
     }
 </style>
@@ -287,8 +333,17 @@
 <div class="avatar-page">
     <div class="avatar-background">
         <div class="avatar-container">
-            <div class="avatar-placeholder" id="avatar">🧑‍🎨</div>
+            <canvas id="live2d-canvas" width="400" height="450"></canvas>
+            <div class="avatar-loading" id="avatarLoading">
+                <div class="avatar-loading-spinner"></div>
+                <div>Live2D 모델 로딩 중...</div>
+            </div>
+            <div class="avatar-status">
+                <span class="status-dot"></span>
+                <span id="avatarStatusText">대기 중</span>
+            </div>
             <div class="avatar-effect" id="avatarEffect"></div>
+            <div class="avatar-badge">Powered by <a href="https://www.live2d.com/" target="_blank">Live2D</a></div>
         </div>
     </div>
 
@@ -297,7 +352,7 @@
         
         <div class="chat-header">
             <h1>아바타 예시</h1>
-            <p>AI의 행동에 따라 아바타가 반응합니다</p>
+            <p>AI의 행동에 따라 Live2D 아바타가 반응합니다</p>
         </div>
 
         <div class="action-info">
@@ -317,7 +372,7 @@
             <div class="message assistant">
                 <span class="message-label">AI</span>
                 <div class="message-content">
-                    안녕하세요! 저와 대화하면 제 감정과 행동이 아바타에 표현됩니다.
+                    안녕하세요! 저와 대화하면 제 감정과 행동이 Live2D 아바타에 표현됩니다. 아바타를 클릭해보세요!
                 </div>
             </div>
         </div>
@@ -339,37 +394,142 @@
     const chatBox = document.getElementById('chatBox');
     const messageInput = document.getElementById('messageInput');
     const loading = document.getElementById('loading');
-    const avatar = document.getElementById('avatar');
     const avatarEffect = document.getElementById('avatarEffect');
+    const avatarStatusText = document.getElementById('avatarStatusText');
+    const avatarLoading = document.getElementById('avatarLoading');
     let conversationHistory = [];
+    let live2dModel = null;
+    let pixiApp = null;
 
     const actionEffects = {
-        'thinking': { emoji: '💭', animation: 'thinking' },
-        'happy': { emoji: '😊', animation: 'happy' },
-        'sad': { emoji: '😢', animation: 'sad' },
-        'angry': { emoji: '😠', animation: 'angry' },
-        'surprised': { emoji: '😲', animation: 'bounce' },
-        'move': { emoji: '🚶', animation: 'move' },
-        'wave': { emoji: '👋', animation: 'bounce' },
-        'nod': { emoji: '✓', animation: 'bounce' },
-        'laugh': { emoji: '😂', animation: 'happy' }
+        'thinking': { emoji: '💭', status: '생각하는 중...' },
+        'happy': { emoji: '😊', status: '기뻐하는 중' },
+        'sad': { emoji: '😢', status: '슬퍼하는 중' },
+        'angry': { emoji: '😠', status: '화나는 중' },
+        'surprised': { emoji: '😲', status: '놀라는 중' },
+        'move': { emoji: '🚶', status: '이동하는 중' },
+        'wave': { emoji: '👋', status: '손 흔드는 중' },
+        'nod': { emoji: '✓', status: '끄덕이는 중' },
+        'laugh': { emoji: '😂', status: '웃는 중' }
     };
 
+    const actionToMotion = {
+        'thinking': 'idle',
+        'happy': 'tap_body',
+        'sad': 'idle',
+        'angry': 'shake',
+        'surprised': 'flick_head',
+        'move': 'tap_body',
+        'wave': 'pinch_in',
+        'nod': 'flick_head',
+        'laugh': 'tap_body'
+    };
+
+    let animationQueue = [];
+    let isAnimating = false;
+
+    async function initLive2D() {
+        const canvas = document.getElementById('live2d-canvas');
+        
+        pixiApp = new PIXI.Application({
+            view: canvas,
+            autoStart: true,
+            backgroundAlpha: 0,
+            width: 400,
+            height: 450
+        });
+
+        const modelUrl = 'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/shizuku/shizuku.model.json';
+        
+        try {
+            live2dModel = await PIXI.live2d.Live2DModel.from(modelUrl);
+            
+            live2dModel.scale.set(0.25);
+            live2dModel.anchor.set(0.5, 0.5);
+            live2dModel.x = pixiApp.screen.width / 2;
+            live2dModel.y = pixiApp.screen.height / 2 + 50;
+
+            live2dModel.interactive = true;
+            live2dModel.buttonMode = true;
+
+            live2dModel.on('pointerdown', (e) => {
+                const point = e.data.global;
+                live2dModel.tap(point.x, point.y);
+            });
+
+            live2dModel.on('pointermove', (e) => {
+                const point = e.data.global;
+                live2dModel.focus(point.x, point.y);
+            });
+
+            pixiApp.stage.addChild(live2dModel);
+            avatarLoading.style.display = 'none';
+            console.log('Live2D model loaded successfully!');
+            
+        } catch (error) {
+            console.error('Failed to load Live2D model:', error);
+            avatarLoading.innerHTML = '<div style="color: var(--error);">모델 로딩 실패</div><div style="font-size: 12px; margin-top: 8px;">대체 모델을 시도합니다...</div>';
+            
+            try {
+                live2dModel = await PIXI.live2d.Live2DModel.from(
+                    'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json'
+                );
+                
+                live2dModel.scale.set(0.08);
+                live2dModel.anchor.set(0.5, 0.5);
+                live2dModel.x = pixiApp.screen.width / 2;
+                live2dModel.y = pixiApp.screen.height / 2 + 80;
+                live2dModel.interactive = true;
+                
+                live2dModel.on('pointerdown', (e) => {
+                    const point = e.data.global;
+                    live2dModel.tap(point.x, point.y);
+                });
+                
+                pixiApp.stage.addChild(live2dModel);
+                avatarLoading.style.display = 'none';
+                
+            } catch (err2) {
+                console.error('Alternative model also failed:', err2);
+                avatarLoading.innerHTML = '<div style="color: var(--error);">Live2D 로딩 실패</div><div style="font-size: 11px; margin-top: 8px;">네트워크를 확인해주세요</div>';
+            }
+        }
+    }
+
+    function triggerLive2DAction(actionName) {
+        if (!live2dModel) return;
+        
+        const motionGroup = actionToMotion[actionName] || 'idle';
+        
+        try {
+            live2dModel.motion(motionGroup, 0, PIXI.live2d.MotionPriority.FORCE);
+        } catch (e) {
+            try {
+                live2dModel.motion('tap_body', 0);
+            } catch (e2) {
+                live2dModel.motion('idle', 0);
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initLive2D);
+
+    window.addEventListener('beforeunload', () => {
+        if (pixiApp) {
+            pixiApp.destroy(true, { children: true, texture: true, baseTexture: true });
+        }
+    });
+
     function processActionTags(message) {
-        // Check if already has full action tag format [{action}content]
         const fullPattern = /^\[\{(\w+)\}(.+)\]$/;
         if (fullPattern.test(message)) {
             return message;
         }
-        
-        // Check if has simple bracket format [content]
         const simplePattern = /^\[(.+)\]$/;
         const simpleMatch = message.match(simplePattern);
         if (simpleMatch) {
             return `[{none_action}${simpleMatch[1]}]`;
         }
-        
-        // Plain message without brackets
         return message;
     }
 
@@ -382,47 +542,60 @@
     function addMessage(role, content, rendered = null) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${role}`;
-        
         const label = document.createElement('span');
         label.className = 'message-label';
         label.textContent = role === 'user' ? '나' : 'AI';
-        
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        
         if (rendered) {
             contentDiv.innerHTML = rendered;
         } else {
             contentDiv.textContent = content;
         }
-        
         messageDiv.appendChild(label);
         messageDiv.appendChild(contentDiv);
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    function clearAnimationQueue() {
+        animationQueue.forEach(id => clearTimeout(id));
+        animationQueue = [];
+        isAnimating = false;
+    }
+
     function applyAvatarEffect(actions) {
-        // Reset avatar
-        avatar.className = 'avatar-placeholder';
+        clearAnimationQueue();
         
         if (actions && actions.length > 0) {
+            isAnimating = true;
+            
             actions.forEach((action, index) => {
-                setTimeout(() => {
-                    const effect = actionEffects[action.action];
-                    if (effect) {
-                        // Apply animation
-                        avatar.classList.add(effect.animation);
-                        
-                        // Show floating emoji
-                        avatarEffect.textContent = effect.emoji;
-                        avatarEffect.className = 'avatar-effect show';
-                        
+                const timeoutId = setTimeout(() => {
+                    const actionName = action.action;
+                    const effect = actionEffects[actionName] || { emoji: '✨', status: actionName };
+                    
+                    triggerLive2DAction(actionName);
+                    
+                    avatarStatusText.textContent = effect.status;
+                    avatarEffect.textContent = effect.emoji;
+                    avatarEffect.className = 'avatar-effect show';
+                    
+                    setTimeout(() => {
+                        avatarEffect.className = 'avatar-effect';
+                    }, 2000);
+                    
+                    if (index === actions.length - 1) {
                         setTimeout(() => {
-                            avatarEffect.className = 'avatar-effect';
-                        }, 2000);
+                            if (isAnimating) {
+                                avatarStatusText.textContent = '대기 중';
+                                isAnimating = false;
+                            }
+                        }, 3000);
                     }
-                }, index * 1000);
+                }, index * 1500);
+                
+                animationQueue.push(timeoutId);
             });
         }
     }
@@ -430,17 +603,15 @@
     async function sendMessage() {
         let message = messageInput.value.trim();
         if (!message) return;
-
-        // Process action tags
         message = processActionTags(message);
-
         messageInput.value = '';
         addMessage('user', message);
         conversationHistory.push({ role: 'user', content: message });
-
         loading.classList.add('show');
-        avatar.classList.add('thinking');
-
+        
+        avatarStatusText.textContent = '생각하는 중...';
+        triggerLive2DAction('thinking');
+        
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -453,25 +624,33 @@
                     history: conversationHistory
                 })
             });
-
             const data = await response.json();
-
             if (data.error) {
                 if (data.redirect) {
                     window.location.href = data.redirect;
                     return;
                 }
                 addMessage('assistant', '오류: ' + data.error);
+                triggerLive2DAction('sad');
+                avatarStatusText.textContent = '오류 발생';
             } else {
                 addMessage('assistant', data.response, data.rendered);
                 conversationHistory.push({ role: 'assistant', content: data.response });
-                applyAvatarEffect(data.actions);
+                if (data.actions && data.actions.length > 0) {
+                    applyAvatarEffect(data.actions);
+                } else {
+                    avatarStatusText.textContent = '대기 중';
+                }
             }
         } catch (error) {
             addMessage('assistant', '오류가 발생했습니다: ' + error.message);
+            triggerLive2DAction('sad');
+            avatarStatusText.textContent = '오류 발생';
+            setTimeout(() => {
+                avatarStatusText.textContent = '대기 중';
+            }, 3000);
         } finally {
             loading.classList.remove('show');
-            avatar.classList.remove('thinking');
         }
     }
 </script>

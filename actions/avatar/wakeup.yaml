@@ -1,0 +1,6 @@
+type: action
+name: wakeup
+definition: |
+  잠에서 깨어나거나 정신을 차리는 행동을 표현합니다.
+  예시: [{wakeup}눈을 뜨며 기지개를 편다], [{wakeup}정신을 차리며]
+  깨어나거나 집중하기 시작할 때 사용합니다.

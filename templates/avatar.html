@@ -394,22 +394,26 @@
         'sad': { emoji: '😢', status: '슬퍼하는 중' },
         'angry': { emoji: '😠', status: '화나는 중' },
         'surprised': { emoji: '😲', status: '놀라는 중' },
-        'move': { emoji: '🚶', status: '이동하는 중' },
-        'wave': { emoji: '👋', status: '손 흔드는 중' },
-        'nod': { emoji: '✓', status: '끄덕이는 중' },
-        'laugh': { emoji: '😂', status: '웃는 중' }
+        'laugh': { emoji: '😂', status: '웃는 중' },
+        'sleep': { emoji: '😴', status: '잠자는 중' },
+        'wakeup': { emoji: '⏰', status: '깨어나는 중' },
+        'shy': { emoji: '😳', status: '부끄러워하는 중' },
+        'touch': { emoji: '👆', status: '터치 반응' }
     };
 
+    // 모션 그룹과 인덱스 매핑 (.mtn 파일 기준)
+    // Breath → idle, Touch/Touch Dere → tap_body, Fail → shake, Sukebei → pinch_out
     const actionToMotion = {
-        'thinking': 'idle',
-        'happy': 'tap_body',
-        'sad': 'idle',
-        'angry': 'shake',
-        'surprised': 'flick_head',
-        'move': 'tap_body',
-        'wave': 'pinch_in',
-        'nod': 'flick_head',
-        'laugh': 'tap_body'
+        'thinking': { group: 'idle', indices: [0, 1, 2] },           // Breath 계열
+        'happy': { group: 'tap_body', indices: [0, 1, 2, 3] },       // Touch Dere 계열 (Success 포함)
+        'sad': { group: 'shake', indices: [0] },                     // Fail 모션
+        'angry': { group: 'shake', indices: [0] },                   // Fail 모션
+        'surprised': { group: 'flick_head', indices: [0, 1] },       // Flick head
+        'laugh': { group: 'tap_body', indices: [0, 1, 2] },          // Touch Dere 계열
+        'sleep': { group: 'idle', indices: [0, 1, 2] },              // Sleeping/Breath 계열
+        'wakeup': { group: 'flick_head', indices: [0, 1] },          // WakeUp
+        'shy': { group: 'pinch_out', indices: [0] },                 // Sukebei 계열
+        'touch': { group: 'tap_body', indices: [0, 1, 2, 3, 4, 5] }  // Touch 계열
     };
 
     let animationQueue = [];
@@ -486,15 +490,22 @@
     function triggerLive2DAction(actionName) {
         if (!live2dModel) return;
         
-        const motionGroup = actionToMotion[actionName] || 'idle';
+        const motionConfig = actionToMotion[actionName] || { group: 'idle', indices: [0] };
+        const group = motionConfig.group;
+        const indices = motionConfig.indices;
+        const index = indices[Math.floor(Math.random() * indices.length)];
         
         try {
-            live2dModel.motion(motionGroup, 0, PIXI.live2d.MotionPriority.FORCE);
+            live2dModel.motion(group, index, PIXI.live2d.MotionPriority.FORCE);
         } catch (e) {
             try {
-                live2dModel.motion('tap_body', 0);
+                live2dModel.motion('tap_body', 0, PIXI.live2d.MotionPriority.FORCE);
             } catch (e2) {
-                live2dModel.motion('idle', 0);
+                try {
+                    live2dModel.motion('idle', 0, PIXI.live2d.MotionPriority.FORCE);
+                } catch (e3) {
+                    // 모든 모션 실패 시 무시
+                }
             }
         }
     }

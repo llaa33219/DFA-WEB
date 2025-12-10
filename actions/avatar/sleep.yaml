@@ -1,0 +1,6 @@
+type: action
+name: sleep
+definition: |
+  잠을 자거나 졸린 상태를 표현합니다.
+  예시: [{sleep}스르르 눈을 감으며], [{sleep}졸린 듯 눈을 깜빡인다]
+  피곤하거나 지루한 상황에서 사용합니다.

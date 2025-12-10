@@ -78,26 +78,7 @@
         50% { opacity: 0.5; transform: scale(1.2); }
     }
 
-    .avatar-effect {
-        position: absolute;
-        top: 30px;
-        right: 20px;
-        font-size: 48px;
-        opacity: 0;
-        transition: all 0.5s ease;
-        pointer-events: none;
-        z-index: 100;
-    }
 
-    .avatar-effect.show {
-        opacity: 1;
-        animation: floatUp 2s ease-out forwards;
-    }
-
-    @keyframes floatUp {
-        0% { transform: translateY(0) scale(1); opacity: 1; }
-        100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
-    }
 
     .avatar-badge {
         position: absolute;
@@ -344,7 +325,7 @@
                 <span class="status-dot"></span>
                 <span id="avatarStatusText">대기 중</span>
             </div>
-            <div class="avatar-effect" id="avatarEffect"></div>
+
             <div class="avatar-badge">Powered by <a href="https://www.live2d.com/" target="_blank">Live2D</a></div>
         </div>
     </div>
@@ -396,7 +377,7 @@
     const chatBox = document.getElementById('chatBox');
     const messageInput = document.getElementById('messageInput');
     const loading = document.getElementById('loading');
-    const avatarEffect = document.getElementById('avatarEffect');
+
     const avatarStatusText = document.getElementById('avatarStatusText');
     const avatarLoading = document.getElementById('avatarLoading');
     let conversationHistory = [];
@@ -575,17 +556,10 @@
             actions.forEach((action, index) => {
                 const timeoutId = setTimeout(() => {
                     const actionName = action.action;
-                    const effect = actionEffects[actionName] || { emoji: '✨', status: actionName };
+                    const effect = actionEffects[actionName] || { status: actionName };
                     
                     triggerLive2DAction(actionName);
-                    
                     avatarStatusText.textContent = effect.status;
-                    avatarEffect.textContent = effect.emoji;
-                    avatarEffect.className = 'avatar-effect show';
-                    
-                    setTimeout(() => {
-                        avatarEffect.className = 'avatar-effect';
-                    }, 2000);
                     
                     if (index === actions.length - 1) {
                         setTimeout(() => {
@@ -593,9 +567,9 @@
                                 avatarStatusText.textContent = '대기 중';
                                 isAnimating = false;
                             }
-                        }, 3000);
+                        }, 2000);
                     }
-                }, index * 1500);
+                }, index * 2000);
                 
                 animationQueue.push(timeoutId);
             });

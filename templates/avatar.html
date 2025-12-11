@@ -542,16 +542,10 @@
     });
 
     function processActionTags(message) {
-        const fullPattern = /^\[\{(\w+)\}(.+)\]$/;
-        if (fullPattern.test(message)) {
-            return message;
-        }
-        const simplePattern = /^\[(.+)\]$/;
-        const simpleMatch = message.match(simplePattern);
-        if (simpleMatch) {
-            return `[{none_action}${simpleMatch[1]}]`;
-        }
-        return message;
+        // Replace all [content] patterns (not already [{action}content]) with [{none_action}content]
+        // This handles: [내용] -> [{none_action}내용]
+        // But preserves: [{action}내용] as is
+        return message.replace(/\[(?!\{)([^\]]+)\]/g, '[{none_action}$1]');
     }
 
     function handleKeyPress(e) {

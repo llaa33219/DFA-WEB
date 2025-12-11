@@ -1,8 +1,8 @@
 {
   "version": "1.0.0",
-  "model": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/model.moc",
+  "model": "model.moc",
   "textures": [
-    "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/textures/default-costume.png"
+    "textures/default-costume.png"
   ],
   "layout": {
     "center_x": 0.0,
@@ -17,65 +17,65 @@
   },
   "motions": {
     "idle": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath1.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath2.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath3.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath5.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath7.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath8.mtn"}
+      {"file": "motions/Breath1.mtn"},
+      {"file": "motions/Breath2.mtn"},
+      {"file": "motions/Breath3.mtn"},
+      {"file": "motions/Breath5.mtn"},
+      {"file": "motions/Breath7.mtn"},
+      {"file": "motions/Breath8.mtn"}
     ],
     "thinking": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath4.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath6.mtn"}
+      {"file": "motions/Breath4.mtn"},
+      {"file": "motions/Breath6.mtn"}
     ],
     "happy": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Success.mtn"}
+      {"file": "motions/Success.mtn"}
     ],
     "sad": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Fail.mtn"}
+      {"file": "motions/Fail.mtn"}
     ],
     "angry": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Fail.mtn"}
+      {"file": "motions/Fail.mtn"}
     ],
     "surprised": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch3.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch4.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch5.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch6.mtn"}
+      {"file": "motions/Touch3.mtn"},
+      {"file": "motions/Touch4.mtn"},
+      {"file": "motions/Touch5.mtn"},
+      {"file": "motions/Touch6.mtn"}
     ],
     "laugh": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere1.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere2.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere3.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Success.mtn"}
+      {"file": "motions/Touch Dere1.mtn"},
+      {"file": "motions/Touch Dere2.mtn"},
+      {"file": "motions/Touch Dere3.mtn"},
+      {"file": "motions/Success.mtn"}
     ],
     "sleep": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Sleeping.mtn"}
+      {"file": "motions/Sleeping.mtn"}
     ],
     "wakeup": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/WakeUp.mtn"},
+      {"file": "motions/WakeUp.mtn"}
     ],
     "shy": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Sukebei1.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Sukebei2.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Sukebei3.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath Dere1.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath Dere2.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Breath Dere3.mtn"}
+      {"file": "motions/Sukebei1.mtn"},
+      {"file": "motions/Sukebei2.mtn"},
+      {"file": "motions/Sukebei3.mtn"},
+      {"file": "motions/Breath Dere1.mtn"},
+      {"file": "motions/Breath Dere2.mtn"},
+      {"file": "motions/Breath Dere3.mtn"}
     ],
     "touch": [
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch1.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch2.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch3.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch4.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch5.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch6.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere1.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere2.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere3.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere4.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere5.mtn"},
-      {"file": "https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/motions/Touch Dere6.mtn"}
+      {"file": "motions/Touch1.mtn"},
+      {"file": "motions/Touch2.mtn"},
+      {"file": "motions/Touch3.mtn"},
+      {"file": "motions/Touch4.mtn"},
+      {"file": "motions/Touch5.mtn"},
+      {"file": "motions/Touch6.mtn"},
+      {"file": "motions/Touch Dere1.mtn"},
+      {"file": "motions/Touch Dere2.mtn"},
+      {"file": "motions/Touch Dere3.mtn"},
+      {"file": "motions/Touch Dere4.mtn"},
+      {"file": "motions/Touch Dere5.mtn"},
+      {"file": "motions/Touch Dere6.mtn"}
     ]
   }
 }

@@ -9,8 +9,8 @@
 <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
 <!-- PixiJS v6 (compatible with pixi-live2d-display) -->
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js"></script>
-<!-- pixi-live2d-display -->
-<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/index.min.js"></script>
+<!-- pixi-live2d-display (Cubism 2 build for .moc models) -->
+<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism2.min.js"></script>
 <style>
     .avatar-page {
         display: flex;
@@ -404,20 +404,62 @@
     // 모션 그룹과 인덱스 매핑 (커스텀 index.json 기준)
     // 행동 명칭과 모션 그룹이 1:1로 매핑됨
     const actionToMotion = {
-        'thinking': { group: 'thinking' },  // Breath4, Breath6, Breath Dere1-3
-        'happy': { group: 'happy' },        // Touch Dere1-6, Success
-        'sad': { group: 'sad' },            // Fail, Sleeping
-        'angry': { group: 'angry' },        // Fail, Touch1-2
-        'surprised': { group: 'surprised' }, // Touch3-6
-        'laugh': { group: 'laugh' },        // Touch Dere1-3, Success
-        'sleep': { group: 'sleep' },        // Sleeping
-        'wakeup': { group: 'wakeup' },      // WakeUp, Touch Dere1-2
-        'shy': { group: 'shy' },            // Sukebei1-3, Breath Dere1-3
-        'touch': { group: 'touch' }         // Touch1-6, Touch Dere1-6
+        'thinking': { group: 'thinking' },
+        'happy': { group: 'happy' },
+        'sad': { group: 'sad' },
+        'angry': { group: 'angry' },
+        'surprised': { group: 'surprised' },
+        'laugh': { group: 'laugh' },
+        'sleep': { group: 'sleep' },
+        'wakeup': { group: 'wakeup' },
+        'shy': { group: 'shy' },
+        'touch': { group: 'touch' }
     };
 
     let animationQueue = [];
     let isAnimating = false;
+
+    const MODEL_URLS = {
+        local: '/static/models/pio/index.json',
+        cdn: 'https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/model.json'
+    };
+
+    async function loadModelWithRetry(url, retries = 2, delay = 1000) {
+        for (let i = 0; i <= retries; i++) {
+            try {
+                const model = await PIXI.live2d.Live2DModel.from(url);
+                return model;
+            } catch (error) {
+                console.warn(`Model load attempt ${i + 1} failed for ${url}:`, error.message);
+                if (i < retries) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                } else {
+                    throw error;
+                }
+            }
+        }
+    }
+
+    function setupModel(model) {
+        model.scale.set(0.5);
+        model.anchor.set(0.5, 0.5);
+        model.x = pixiApp.screen.width / 2;
+        model.y = pixiApp.screen.height / 2 + 50;
+        model.interactive = true;
+        model.buttonMode = true;
+
+        model.on('pointerdown', (e) => {
+            const point = e.data.global;
+            model.tap(point.x, point.y);
+        });
+
+        model.on('pointermove', (e) => {
+            const point = e.data.global;
+            model.focus(point.x, point.y);
+        });
+
+        return model;
+    }
 
     async function initLive2D() {
         const canvas = document.getElementById('live2d-canvas');
@@ -430,60 +472,46 @@
             height: 740
         });
 
-        const modelUrl = '/static/models/pio/index.json';
-        
+        // Try local files first
         try {
-            live2dModel = await PIXI.live2d.Live2DModel.from(modelUrl);
-            
-            live2dModel.scale.set(0.5);
-            live2dModel.anchor.set(0.5, 0.5);
-            live2dModel.x = pixiApp.screen.width / 2;
-            live2dModel.y = pixiApp.screen.height / 2 + 50;
-
-            live2dModel.interactive = true;
-            live2dModel.buttonMode = true;
-
-            live2dModel.on('pointerdown', (e) => {
-                const point = e.data.global;
-                live2dModel.tap(point.x, point.y);
-            });
-
-            live2dModel.on('pointermove', (e) => {
-                const point = e.data.global;
-                live2dModel.focus(point.x, point.y);
-            });
-
+            avatarLoading.querySelector('div:last-child').textContent = '로컬 모델 로딩 중...';
+            live2dModel = await loadModelWithRetry(MODEL_URLS.local, 1, 500);
+            setupModel(live2dModel);
             pixiApp.stage.addChild(live2dModel);
             avatarLoading.style.display = 'none';
-            console.log('Live2D model loaded successfully!');
-            
-        } catch (error) {
-            console.error('Failed to load Live2D model:', error);
-            avatarLoading.innerHTML = '<div style="color: var(--error);">모델 로딩 실패</div><div style="font-size: 12px; margin-top: 8px;">대체 모델을 시도합니다...</div>';
-            
-            try {
-                live2dModel = await PIXI.live2d.Live2DModel.from(
-                    '/static/models/pio/index.json'
-                );
-                
-                live2dModel.scale.set(0.08);
-                live2dModel.anchor.set(0.5, 0.5);
-                live2dModel.x = pixiApp.screen.width / 2;
-                live2dModel.y = pixiApp.screen.height / 2 + 80;
-                live2dModel.interactive = true;
-                
-                live2dModel.on('pointerdown', (e) => {
-                    const point = e.data.global;
-                    live2dModel.tap(point.x, point.y);
-                });
-                
-                pixiApp.stage.addChild(live2dModel);
-                avatarLoading.style.display = 'none';
-                
-            } catch (err2) {
-                console.error('Alternative model also failed:', err2);
-                avatarLoading.innerHTML = '<div style="color: var(--error);">Live2D 로딩 실패</div><div style="font-size: 11px; margin-top: 8px;">네트워크를 확인해주세요</div>';
-            }
+            console.log('Live2D model loaded from local files!');
+            return;
+        } catch (localError) {
+            console.warn('Local model failed, trying CDN fallback...', localError.message);
+        }
+
+        // Fallback to CDN
+        try {
+            avatarLoading.querySelector('div:last-child').textContent = 'CDN에서 모델 로딩 중...';
+            live2dModel = await loadModelWithRetry(MODEL_URLS.cdn, 2, 1500);
+            setupModel(live2dModel);
+            pixiApp.stage.addChild(live2dModel);
+            avatarLoading.style.display = 'none';
+            console.log('Live2D model loaded from CDN!');
+            return;
+        } catch (cdnError) {
+            console.error('All model sources failed:', cdnError);
+            avatarLoading.innerHTML = `
+                <div style="color: var(--error); font-weight: 600;">Live2D 로딩 실패</div>
+                <div style="font-size: 12px; margin-top: 8px; color: var(--gray-600);">
+                    네트워크 연결을 확인하거나<br>페이지를 새로고침 해주세요
+                </div>
+                <button onclick="location.reload()" style="
+                    margin-top: 12px;
+                    padding: 8px 16px;
+                    background: var(--primary-500);
+                    color: white;
+                    border: none;
+                    border-radius: var(--radius-md);
+                    cursor: pointer;
+                    font-size: 13px;
+                ">새로고침</button>
+            `;
         }
     }
 

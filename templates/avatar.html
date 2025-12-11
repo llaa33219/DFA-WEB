@@ -401,19 +401,19 @@
         'touch': { emoji: '👆', status: '터치 반응' }
     };
 
-    // 모션 그룹과 인덱스 매핑 (.mtn 파일 기준)
-    // Breath → idle, Touch/Touch Dere → tap_body, Fail → shake, Sukebei → pinch_out
+    // 모션 그룹과 인덱스 매핑 (커스텀 index.json 기준)
+    // 행동 명칭과 모션 그룹이 1:1로 매핑됨
     const actionToMotion = {
-        'thinking': { group: 'idle', indices: [0, 1, 2] },           // Breath 계열
-        'happy': { group: 'tap_body', indices: [0, 1, 2, 3] },       // Touch Dere 계열 (Success 포함)
-        'sad': { group: 'shake', indices: [0] },                     // Fail 모션
-        'angry': { group: 'shake', indices: [0] },                   // Fail 모션
-        'surprised': { group: 'flick_head', indices: [0, 1] },       // Flick head
-        'laugh': { group: 'tap_body', indices: [0, 1, 2] },          // Touch Dere 계열
-        'sleep': { group: 'idle', indices: [0, 1, 2] },              // Sleeping/Breath 계열
-        'wakeup': { group: 'flick_head', indices: [0, 1] },          // WakeUp
-        'shy': { group: 'pinch_out', indices: [0] },                 // Sukebei 계열
-        'touch': { group: 'tap_body', indices: [0, 1, 2, 3, 4, 5] }  // Touch 계열
+        'thinking': { group: 'thinking' },  // Breath4, Breath6, Breath Dere1-3
+        'happy': { group: 'happy' },        // Touch Dere1-6, Success
+        'sad': { group: 'sad' },            // Fail, Sleeping
+        'angry': { group: 'angry' },        // Fail, Touch1-2
+        'surprised': { group: 'surprised' }, // Touch3-6
+        'laugh': { group: 'laugh' },        // Touch Dere1-3, Success
+        'sleep': { group: 'sleep' },        // Sleeping
+        'wakeup': { group: 'wakeup' },      // WakeUp, Touch Dere1-2
+        'shy': { group: 'shy' },            // Sukebei1-3, Breath Dere1-3
+        'touch': { group: 'touch' }         // Touch1-6, Touch Dere1-6
     };
 
     let animationQueue = [];
@@ -430,7 +430,7 @@
             height: 740
         });
 
-        const modelUrl = 'https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Tia/index.json';
+        const modelUrl = '/static/models/pio/index.json';
         
         try {
             live2dModel = await PIXI.live2d.Live2DModel.from(modelUrl);
@@ -463,7 +463,7 @@
             
             try {
                 live2dModel = await PIXI.live2d.Live2DModel.from(
-                    'https://cdn.jsdelivr.net/npm/live2d-widget-model@1.0.1/model/Potion-Maker/Pio/index.json'
+                    '/static/models/pio/index.json'
                 );
                 
                 live2dModel.scale.set(0.08);
@@ -490,22 +490,17 @@
     function triggerLive2DAction(actionName) {
         if (!live2dModel) return;
         
-        const motionConfig = actionToMotion[actionName] || { group: 'idle', indices: [0] };
+        const motionConfig = actionToMotion[actionName] || { group: 'idle' };
         const group = motionConfig.group;
-        const indices = motionConfig.indices;
-        const index = indices[Math.floor(Math.random() * indices.length)];
         
+        // 그룹 내 랜덤 인덱스 선택 (모델에서 자동 처리)
         try {
-            live2dModel.motion(group, index, PIXI.live2d.MotionPriority.FORCE);
+            live2dModel.motion(group, undefined, PIXI.live2d.MotionPriority.FORCE);
         } catch (e) {
             try {
-                live2dModel.motion('tap_body', 0, PIXI.live2d.MotionPriority.FORCE);
+                live2dModel.motion('idle', undefined, PIXI.live2d.MotionPriority.FORCE);
             } catch (e2) {
-                try {
-                    live2dModel.motion('idle', 0, PIXI.live2d.MotionPriority.FORCE);
-                } catch (e3) {
-                    // 모든 모션 실패 시 무시
-                }
+                // 모든 모션 실패 시 무시
             }
         }
     }

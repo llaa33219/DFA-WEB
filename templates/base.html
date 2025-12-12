@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -282,6 +282,38 @@
             color: var(--gray-700);
         }
 
+        /* Language Toggle */
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+            padding: 4px;
+            gap: 2px;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: var(--gray-500);
+            cursor: pointer;
+            border-radius: var(--radius-full);
+            transition: all var(--duration-fast) ease;
+        }
+
+        .lang-btn:hover {
+            color: var(--gray-700);
+        }
+
+        .lang-btn.active {
+            background: var(--white);
+            color: var(--primary-500);
+            box-shadow: var(--shadow-sm);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .navbar {
@@ -304,11 +336,15 @@
         <div class="navbar-container">
             <a href="/" class="navbar-logo">DFA-Notation-Grammar</a>
             <div class="navbar-links">
+                <div class="lang-toggle">
+                    <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn" data-lang="ko" onclick="setLanguage('ko')">한</button>
+                </div>
                 {% if logged_in %}
                 <span class="user-name">{{ username }}</span>
-                <a href="/logout" class="btn btn-secondary btn-sm">로그아웃</a>
+                <a href="/logout" class="btn btn-secondary btn-sm" data-i18n="logout">Logout</a>
                 {% else %}
-                <a href="/login" class="btn btn-primary btn-sm">🤗 Hugging Face 로그인</a>
+                <a href="/login" class="btn btn-primary btn-sm" data-i18n="login">🤗 Login with Hugging Face</a>
                 {% endif %}
             </div>
         </div>
@@ -316,6 +352,120 @@
     
     {% block content %}{% endblock %}
     
+    <script>
+        // Base translations
+        const baseTranslations = {
+            en: {
+                'logout': 'Logout',
+                'login': '🤗 Login with Hugging Face',
+                'back': '← Back',
+                'send': 'Send',
+                'message_placeholder': 'Enter your message...',
+                'loading': 'Generating response...',
+                'me': 'Me',
+                'ai': 'AI',
+                'waiting': 'Waiting',
+                'thinking': 'Thinking...',
+                'error_occurred': 'An error occurred: '
+            },
+            ko: {
+                'logout': '로그아웃',
+                'login': '🤗 Hugging Face 로그인',
+                'back': '← 돌아가기',
+                'send': '전송',
+                'message_placeholder': '메시지를 입력하세요...',
+                'loading': '응답 생성 중...',
+                'me': '나',
+                'ai': 'AI',
+                'waiting': '대기 중',
+                'thinking': '생각하는 중...',
+                'error_occurred': '오류가 발생했습니다: '
+            }
+        };
+
+        // Page-specific translations (can be extended by each page)
+        let pageTranslations = { en: {}, ko: {} };
+
+        // Merge translations
+        function getTranslations() {
+            return {
+                en: { ...baseTranslations.en, ...pageTranslations.en },
+                ko: { ...baseTranslations.ko, ...pageTranslations.ko }
+            };
+        }
+
+        // Get current language
+        function getCurrentLang() {
+            return localStorage.getItem('lang') || 'en';
+        }
+
+        // Set language and update UI
+        function setLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            updateLanguage();
+        }
+
+        // Update all translatable elements
+        function updateLanguage() {
+            const lang = getCurrentLang();
+            const translations = getTranslations();
+            
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+            
+            // Update toggle buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+            
+            // Update elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update elements with data-i18n-html attribute (for content with HTML)
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                const key = el.dataset.i18nHtml;
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            
+            // Update elements with data-i18n-placeholder attribute
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.dataset.i18nPlaceholder;
+                if (translations[lang][key]) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
+            
+            // Update elements with data-i18n-title attribute
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const key = el.dataset.i18nTitle;
+                if (translations[lang][key]) {
+                    el.title = translations[lang][key];
+                }
+            });
+
+            // Dispatch custom event for page-specific updates
+            window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+        }
+
+        // Get translation by key
+        function t(key) {
+            const lang = getCurrentLang();
+            const translations = getTranslations();
+            return translations[lang][key] || key;
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLanguage();
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

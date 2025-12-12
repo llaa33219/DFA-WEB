@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}DFA-Notation-Grammar - 예시{% endblock %}
+{% block title %}DFA-Notation-Grammar - Examples{% endblock %}
 
 {% block head %}
 <style>
@@ -112,8 +112,8 @@
 {% block content %}
 <main class="container">
     <section class="hero">
-        <h1 class="hero-title">선언성 자유 형식 표기 행동 문법</h1>
-        <p class="hero-subtitle">Declarative Free-Form Action Notation Grammar</p>
+        <h1 class="hero-title" data-i18n="hero_title">Declarative Free-Form Action Notation Grammar</h1>
+        <p class="hero-subtitle" data-i18n="hero_subtitle">DFA-Notation-Grammar</p>
         
         <div class="hero-buttons">
             <a href="https://github.com/llaa33219/DFA-Notation-Grammar" target="_blank" class="btn btn-github btn-lg">
@@ -130,39 +130,77 @@
 
     {% if not logged_in %}
     <div class="login-notice">
-        <p>예시를 사용하려면 Hugging Face 로그인이 필요합니다.</p>
-        <a href="/login" class="btn btn-primary">🤗 Hugging Face로 로그인</a>
+        <p data-i18n="login_notice">Hugging Face login is required to use the examples.</p>
+        <a href="/login" class="btn btn-primary" data-i18n="login_btn">🤗 Login with Hugging Face</a>
     </div>
     {% endif %}
 
     <section class="examples-section">
-        <h2 class="examples-title">예시 선택</h2>
+        <h2 class="examples-title" data-i18n="examples_title">Select Example</h2>
         
         <div class="examples-grid">
             <a href="/chatbot" class="card example-card">
                 <div class="example-icon">💬</div>
-                <h3>Chatbot</h3>
-                <p>챗봇 예시</p>
+                <h3 data-i18n="chatbot_title">Chatbot</h3>
+                <p data-i18n="chatbot_desc">Chatbot example</p>
             </a>
             
             <a href="/avatar" class="card example-card">
                 <div class="example-icon">👤</div>
-                <h3>아바타</h3>
-                <p>아바타 예시</p>
+                <h3 data-i18n="avatar_title">Avatar</h3>
+                <p data-i18n="avatar_desc">Avatar example</p>
             </a>
             
             <a href="/robot" class="card example-card">
                 <div class="example-icon">💻</div>
-                <h3>로봇</h3>
-                <p>로봇 제어 예시</p>
+                <h3 data-i18n="robot_title">Robot</h3>
+                <p data-i18n="robot_desc">Robot control example</p>
             </a>
             
             <a href="/affinity" class="card example-card">
                 <div class="example-icon">❤️</div>
-                <h3>호감도</h3>
-                <p>호감도 예시</p>
+                <h3 data-i18n="affinity_title">Affinity</h3>
+                <p data-i18n="affinity_desc">Affinity example</p>
             </a>
         </div>
     </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    pageTranslations = {
+        en: {
+            'hero_title': 'Declarative Free-Form Action Notation Grammar',
+            'hero_subtitle': 'DFA-Notation-Grammar',
+            'login_notice': 'Hugging Face login is required to use the examples.',
+            'login_btn': '🤗 Login with Hugging Face',
+            'examples_title': 'Select Example',
+            'chatbot_title': 'Chatbot',
+            'chatbot_desc': 'Chatbot example',
+            'avatar_title': 'Avatar',
+            'avatar_desc': 'Avatar example',
+            'robot_title': 'Robot',
+            'robot_desc': 'Robot control example',
+            'affinity_title': 'Affinity',
+            'affinity_desc': 'Affinity example'
+        },
+        ko: {
+            'hero_title': '선언성 자유 형식 표기 행동 문법',
+            'hero_subtitle': 'Declarative Free-Form Action Notation Grammar',
+            'login_notice': '예시를 사용하려면 Hugging Face 로그인이 필요합니다.',
+            'login_btn': '🤗 Hugging Face로 로그인',
+            'examples_title': '예시 선택',
+            'chatbot_title': 'Chatbot',
+            'chatbot_desc': '챗봇 예시',
+            'avatar_title': '아바타',
+            'avatar_desc': '아바타 예시',
+            'robot_title': '로봇',
+            'robot_desc': '로봇 제어 예시',
+            'affinity_title': '호감도',
+            'affinity_desc': '호감도 예시'
+        }
+    };
+    updateLanguage();
+</script>
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}로봇 - DFA-Notation-Grammar{% endblock %}
+{% block title %}Robot - DFA-Notation-Grammar{% endblock %}
 
 {% block head %}
 <style>
@@ -192,46 +192,44 @@
 {% block content %}
 <div class="robot-page">
     <div class="chat-panel">
-        <a href="/" class="back-link">← 돌아가기</a>
+        <a href="/" class="back-link" data-i18n="back">← Back</a>
         
         <div class="panel-header">
-            <h2>로봇 제어</h2>
-            <p>AI와 대화 형식으로 로봇 제어하는 예시입니다.</p>
+            <h2 data-i18n="robot_page_title">Robot Control</h2>
+            <p data-i18n="robot_page_desc">An example of controlling a robot through conversation with AI.</p>
         </div>
 
         <div class="chat-box" id="chatBox">
             <div class="message assistant">
-                <span class="message-label">AI</span>
-                <div class="message-content">
-                    명령에 따라 적합한 행동을 수행합니다.
-                </div>
+                <span class="message-label" data-i18n="ai">AI</span>
+                <div class="message-content" data-i18n="robot_welcome">I will perform appropriate actions according to commands.</div>
             </div>
         </div>
 
         <div class="loading" id="loading">
-            <span>응답 생성 중...</span>
+            <span data-i18n="loading">Generating response...</span>
         </div>
 
         <div class="input-area">
-            <input type="text" class="input" id="messageInput" placeholder="명령을 입력하세요..." onkeypress="handleKeyPress(event)">
-            <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+            <input type="text" class="input" id="messageInput" data-i18n-placeholder="command_placeholder" placeholder="Enter command..." onkeypress="handleKeyPress(event)">
+            <button class="btn btn-primary" onclick="sendMessage()" data-i18n="send">Send</button>
         </div>
     </div>
 
     <div class="console-panel">
         <div class="panel-header">
-            <h2>📟 로봇 콘솔</h2>
-            <p>로봇에게 전송된 액션 명령 로그</p>
+            <h2 data-i18n="console_title">📟 Robot Console</h2>
+            <p data-i18n="console_desc">Action command logs sent to the robot</p>
         </div>
 
         <div class="console-box" id="consoleBox">
             <div class="console-line">
-                <span class="timestamp">[시스템]</span>
-                <span class="action-content">로봇 콘솔이 초기화되었습니다.</span>
+                <span class="timestamp" data-i18n="system">[System]</span>
+                <span class="action-content" data-i18n="console_init">Robot console initialized.</span>
             </div>
             <div class="console-line">
-                <span class="timestamp">[시스템]</span>
-                <span class="action-content">명령 대기 중...</span>
+                <span class="timestamp" data-i18n="system">[System]</span>
+                <span class="action-content" data-i18n="console_waiting">Waiting for command...</span>
             </div>
         </div>
     </div>
@@ -240,6 +238,38 @@
 
 {% block scripts %}
 <script>
+    pageTranslations = {
+        en: {
+            'robot_page_title': 'Robot Control',
+            'robot_page_desc': 'An example of controlling a robot through conversation with AI.',
+            'robot_welcome': 'I will perform appropriate actions according to commands.',
+            'command_placeholder': 'Enter command...',
+            'console_title': '📟 Robot Console',
+            'console_desc': 'Action command logs sent to the robot',
+            'system': '[System]',
+            'console_init': 'Robot console initialized.',
+            'console_waiting': 'Waiting for command...',
+            'user_command_received': 'User command received: ',
+            'command_sent': ' command sent successfully',
+            'comm_error': 'Communication error: '
+        },
+        ko: {
+            'robot_page_title': '로봇 제어',
+            'robot_page_desc': 'AI와 대화 형식으로 로봇 제어하는 예시입니다.',
+            'robot_welcome': '명령에 따라 적합한 행동을 수행합니다.',
+            'command_placeholder': '명령을 입력하세요...',
+            'console_title': '📟 로봇 콘솔',
+            'console_desc': '로봇에게 전송된 액션 명령 로그',
+            'system': '[시스템]',
+            'console_init': '로봇 콘솔이 초기화되었습니다.',
+            'console_waiting': '명령 대기 중...',
+            'user_command_received': '사용자 명령 수신: ',
+            'command_sent': ' 명령 전송 완료',
+            'comm_error': '통신 오류: '
+        }
+    };
+    updateLanguage();
+
     const chatBox = document.getElementById('chatBox');
     const consoleBox = document.getElementById('consoleBox');
     const messageInput = document.getElementById('messageInput');
@@ -284,7 +314,7 @@
         
         const label = document.createElement('span');
         label.className = 'message-label';
-        label.textContent = role === 'user' ? '나' : 'AI';
+        label.textContent = role === 'user' ? t('me') : t('ai');
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
@@ -309,7 +339,7 @@
                     
                     // Simulate sending to robot
                     setTimeout(() => {
-                        addConsoleLog('', null, `[${action.action}] 명령 전송 완료`, 'sent');
+                        addConsoleLog('', null, `[${action.action}]${t('command_sent')}`, 'sent');
                     }, 300);
                 }, index * 500);
             });
@@ -323,7 +353,7 @@
         messageInput.value = '';
         addMessage('user', message);
         conversationHistory.push({ role: 'user', content: message });
-        addConsoleLog('', null, `사용자 명령 수신: "${message}"`);
+        addConsoleLog('', null, `${t('user_command_received')}"${message}"`);
 
         loading.classList.add('show');
 
@@ -347,16 +377,16 @@
                     window.location.href = data.redirect;
                     return;
                 }
-                addMessage('assistant', '오류: ' + data.error);
-                addConsoleLog('', null, '오류: ' + data.error, 'error');
+                addMessage('assistant', t('error_occurred') + data.error);
+                addConsoleLog('', null, t('error_occurred') + data.error, 'error');
             } else {
                 addMessage('assistant', data.response, data.rendered);
                 conversationHistory.push({ role: 'assistant', content: data.response });
                 processRobotActions(data.actions);
             }
         } catch (error) {
-            addMessage('assistant', '오류가 발생했습니다: ' + error.message);
-            addConsoleLog('', null, '통신 오류: ' + error.message, 'error');
+            addMessage('assistant', t('error_occurred') + error.message);
+            addConsoleLog('', null, t('comm_error') + error.message, 'error');
         } finally {
             loading.classList.remove('show');
         }

@@ -159,51 +159,75 @@
 
 {% block content %}
 <main class="chat-container">
-    <a href="/" class="back-link">← 돌아가기</a>
+    <a href="/" class="back-link" data-i18n="back">← Back</a>
     
     <div class="chat-header">
-        <h1>Chatbot</h1>
-        <p>DFA표기문법을 사용하여 대화할 수 있습니다.</p>
+        <h1 data-i18n="chatbot_page_title">Chatbot</h1>
+        <p data-i18n="chatbot_page_desc">You can chat using DFA notation grammar.</p>
     </div>
 
     <div class="action-info">
-        <div class="action-info-title">💡 행동 명칭 사용법</div>
-        <div class="action-info-desc">
-            • <code>[내용]</code> 형식으로 입력하면 자동으로 <code>[{none_action}내용]</code>으로 변환됩니다.<br>
-            • <code>{none_action}</code>은 하나로 정해지지 않고 모든 곳에 사용할 수 있는 행동 명칭을 의미합니다.<br>
-            • <code>[{행동 명칭}내용]</code> 형식으로 직접 입력할 수도 있습니다.
+        <div class="action-info-title" data-i18n="action_usage_title">💡 How to use action tags</div>
+        <div class="action-info-desc" data-i18n-html="action_usage_desc_chatbot">
+            • Input in <code>[content]</code> format will automatically convert to <code>[{none_action}content]</code>.<br>
+            • <code>{none_action}</code> is a general action tag that can be used anywhere.<br>
+            • You can also directly input in <code>[{action_name}content]</code> format.
         </div>
-        <div class="action-info-title" style="margin-top: var(--space-sm);">사용 가능한 행동 명칭</div>
+        <div class="action-info-title" style="margin-top: var(--space-sm);" data-i18n="available_actions">Available action tags</div>
         <div class="action-tags-list">
             {% for name, definition in actions.items() %}
             <span class="action-tag-item" title="{{ definition }}">{{ name }}</span>
             {% endfor %}
-            <span class="action-tag-item" title="행동 명칭 없이 내용만 표현">none_action</span>
+            <span class="action-tag-item" data-i18n-title="none_action_desc" title="Express content without action tag">none_action</span>
         </div>
     </div>
 
     <div class="chat-box" id="chatBox">
         <div class="message assistant">
-            <span class="message-label">AI</span>
-            <div class="message-content">
-                저는 DFA표기문법을 사용하여 대화할 수 있습니다! 재미있게 대화해 보세요
-            </div>
+            <span class="message-label" data-i18n="ai">AI</span>
+            <div class="message-content" data-i18n="chatbot_welcome">I can chat using DFA notation grammar! Let's have a fun conversation</div>
         </div>
     </div>
 
     <div class="loading" id="loading">
-        <span>AI가 응답을 생성하고 있습니다...</span>
+        <span data-i18n="ai_loading">AI is generating a response...</span>
     </div>
 
     <div class="input-area">
-        <input type="text" class="input" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
-        <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+        <input type="text" class="input" id="messageInput" data-i18n-placeholder="message_placeholder" placeholder="Enter your message..." onkeypress="handleKeyPress(event)">
+        <button class="btn btn-primary" onclick="sendMessage()" data-i18n="send">Send</button>
     </div>
 </main>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    pageTranslations = {
+        en: {
+            'chatbot_page_title': 'Chatbot',
+            'chatbot_page_desc': 'You can chat using DFA notation grammar.',
+            'action_usage_title': '💡 How to use action tags',
+            'action_usage_desc_chatbot': '• Input in <code>[content]</code> format will automatically convert to <code>[{none_action}content]</code>.<br>• <code>{none_action}</code> is a general action tag that can be used anywhere.<br>• You can also directly input in <code>[{action_name}content]</code> format.',
+            'available_actions': 'Available action tags',
+            'none_action_desc': 'Express content without action tag',
+            'chatbot_welcome': 'I can chat using DFA notation grammar! Let\'s have a fun conversation',
+            'ai_loading': 'AI is generating a response...',
+            'error_prefix': 'Error: '
+        },
+        ko: {
+            'chatbot_page_title': 'Chatbot',
+            'chatbot_page_desc': 'DFA표기문법을 사용하여 대화할 수 있습니다.',
+            'action_usage_title': '💡 행동 명칭 사용법',
+            'action_usage_desc_chatbot': '• <code>[내용]</code> 형식으로 입력하면 자동으로 <code>[{none_action}내용]</code>으로 변환됩니다.<br>• <code>{none_action}</code>은 하나로 정해지지 않고 모든 곳에 사용할 수 있는 행동 명칭을 의미합니다.<br>• <code>[{행동 명칭}내용]</code> 형식으로 직접 입력할 수도 있습니다.',
+            'available_actions': '사용 가능한 행동 명칭',
+            'none_action_desc': '행동 명칭 없이 내용만 표현',
+            'chatbot_welcome': '저는 DFA표기문법을 사용하여 대화할 수 있습니다! 재미있게 대화해 보세요',
+            'ai_loading': 'AI가 응답을 생성하고 있습니다...',
+            'error_prefix': '오류: '
+        }
+    };
+    updateLanguage();
+
     const chatBox = document.getElementById('chatBox');
     const messageInput = document.getElementById('messageInput');
     const loading = document.getElementById('loading');
@@ -228,7 +252,7 @@
         
         const label = document.createElement('span');
         label.className = 'message-label';
-        label.textContent = role === 'user' ? '나' : 'AI';
+        label.textContent = role === 'user' ? t('me') : t('ai');
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
@@ -288,7 +312,7 @@
                     window.location.href = data.redirect;
                     return;
                 }
-                addMessage('assistant', '오류: ' + data.error);
+                addMessage('assistant', t('error_prefix') + data.error);
             } else {
                 // Update user message with rendered version
                 if (data.user_rendered) {
@@ -298,7 +322,7 @@
                 conversationHistory.push({ role: 'assistant', content: data.response });
             }
         } catch (error) {
-            addMessage('assistant', '오류가 발생했습니다: ' + error.message);
+            addMessage('assistant', t('error_occurred') + error.message);
         } finally {
             loading.classList.remove('show');
         }

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}아바타 - DFA-Notation-Grammar{% endblock %}
+{% block title %}Avatar - DFA-Notation-Grammar{% endblock %}
 
 {% block head %}
 <!-- Live2D Cubism 2 Runtime (for older models like Shizuku) -->
@@ -322,11 +322,11 @@
             <canvas id="live2d-canvas" width="400" height="450"></canvas>
             <div class="avatar-loading" id="avatarLoading">
                 <div class="avatar-loading-spinner"></div>
-                <div>Live2D 모델 로딩 중...</div>
+                <div data-i18n="live2d_loading">Loading Live2D model...</div>
             </div>
             <div class="avatar-status">
                 <span class="status-dot"></span>
-                <span id="avatarStatusText">대기 중</span>
+                <span id="avatarStatusText">Waiting</span>
             </div>
 
             <div class="avatar-badge avatar-badge-top">Powered by <a href="https://www.live2d.com/" target="_blank">Live2D</a></div>
@@ -335,42 +335,40 @@
     </div>
 
     <div class="chat-panel">
-        <a href="/" class="back-link">← 돌아가기</a>
+        <a href="/" class="back-link" data-i18n="back">← Back</a>
         
         <div class="chat-header">
-            <h1>아바타 예시</h1>
-            <p>AI의 행동에 따라 Live2D 아바타가 반응합니다</p>
+            <h1 data-i18n="avatar_page_title">Avatar Example</h1>
+            <p data-i18n="avatar_page_desc">Live2D avatar reacts based on AI's actions</p>
         </div>
 
         <div class="action-info">
-            <div class="action-info-title">💡 행동 명칭 사용법</div>
-            <div class="action-info-desc">
-                <code>[내용]</code> → <code>[{none_action}내용]</code> | <code>[{행동 명칭}내용]</code> 직접 입력 가능
+            <div class="action-info-title" data-i18n="action_usage_title">💡 How to use action tags</div>
+            <div class="action-info-desc" data-i18n-html="action_usage_desc_avatar">
+                <code>[content]</code> → <code>[{none_action}content]</code> | You can also directly input <code>[{action_name}content]</code>
             </div>
             <div class="action-tags-list">
                 {% for name, definition in actions.items() %}
                 <span class="action-tag-item" title="{{ definition }}">{{ name }}</span>
                 {% endfor %}
-                <span class="action-tag-item" title="행동 명칭 없이 내용만 표현">none_action</span>
+                <span class="action-tag-item" data-i18n-title="none_action_desc" title="Express content without action tag">none_action</span>
             </div>
         </div>
 
         <div class="chat-box" id="chatBox">
             <div class="message assistant">
-                <span class="message-label">AI</span>
-                <div class="message-content">
-                    안녕하세요! 당신과 자유롭게 대화하고 싶어요
-                </div>
+                <span class="message-label" data-i18n="ai">AI</span>
+                <div class="message-content" data-i18n="avatar_welcome">Hello! I'd love to chat with you freely</div>
             </div>
         </div>
 
         <div class="loading" id="loading">
-            <span>응답 생성 중...</span>
+            <span data-i18n="loading">Generating response...</span>
         </div>
 
         <div class="input-area">
-            <input type="text" class="input" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
-            <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+            <input type="text" class="input" id="messageInput" data-i18n-placeholder="message_placeholder" placeholder="Enter your message..." onkeypress="handleKeyPress(event)">
+            <button class="btn btn-primary" onclick="sendMessage()" data-i18n="send">Send</button>
         </div>
     </div>
 </div>
@@ -378,6 +376,62 @@
 
 {% block scripts %}
 <script>
+    pageTranslations = {
+        en: {
+            'avatar_page_title': 'Avatar Example',
+            'avatar_page_desc': 'Live2D avatar reacts based on AI\'s actions',
+            'action_usage_title': '💡 How to use action tags',
+            'action_usage_desc_avatar': '<code>[content]</code> → <code>[{none_action}content]</code> | You can also directly input <code>[{action_name}content]</code>',
+            'none_action_desc': 'Express content without action tag',
+            'avatar_welcome': 'Hello! I\'d love to chat with you freely',
+            'live2d_loading': 'Loading Live2D model...',
+            'live2d_local_loading': 'Loading local model...',
+            'live2d_cdn_loading': 'Loading model from CDN...',
+            'live2d_failed': 'Live2D loading failed',
+            'live2d_retry_msg': 'Please check your network connection<br>or refresh the page',
+            'refresh': 'Refresh',
+            'status_waiting': 'Waiting',
+            'status_thinking': 'Thinking...',
+            'status_happy': 'Happy',
+            'status_sad': 'Sad',
+            'status_angry': 'Angry',
+            'status_surprised': 'Surprised',
+            'status_laugh': 'Laughing',
+            'status_sleep': 'Sleeping',
+            'status_wakeup': 'Waking up',
+            'status_shy': 'Shy',
+            'status_touch': 'Touch reaction',
+            'status_error': 'Error occurred'
+        },
+        ko: {
+            'avatar_page_title': '아바타 예시',
+            'avatar_page_desc': 'AI의 행동에 따라 Live2D 아바타가 반응합니다',
+            'action_usage_title': '💡 행동 명칭 사용법',
+            'action_usage_desc_avatar': '<code>[내용]</code> → <code>[{none_action}내용]</code> | <code>[{행동 명칭}내용]</code> 직접 입력 가능',
+            'none_action_desc': '행동 명칭 없이 내용만 표현',
+            'avatar_welcome': '안녕하세요! 당신과 자유롭게 대화하고 싶어요',
+            'live2d_loading': 'Live2D 모델 로딩 중...',
+            'live2d_local_loading': '로컬 모델 로딩 중...',
+            'live2d_cdn_loading': 'CDN에서 모델 로딩 중...',
+            'live2d_failed': 'Live2D 로딩 실패',
+            'live2d_retry_msg': '네트워크 연결을 확인하거나<br>페이지를 새로고침 해주세요',
+            'refresh': '새로고침',
+            'status_waiting': '대기 중',
+            'status_thinking': '생각하는 중...',
+            'status_happy': '기뻐하는 중',
+            'status_sad': '슬퍼하는 중',
+            'status_angry': '화나는 중',
+            'status_surprised': '놀라는 중',
+            'status_laugh': '웃는 중',
+            'status_sleep': '잠자는 중',
+            'status_wakeup': '깨어나는 중',
+            'status_shy': '부끄러워하는 중',
+            'status_touch': '터치 반응',
+            'status_error': '오류 발생'
+        }
+    };
+    updateLanguage();
+
     const chatBox = document.getElementById('chatBox');
     const messageInput = document.getElementById('messageInput');
     const loading = document.getElementById('loading');
@@ -388,18 +442,20 @@
     let live2dModel = null;
     let pixiApp = null;
 
-    const actionEffects = {
-        'thinking': { emoji: '💭', status: '생각하는 중...' },
-        'happy': { emoji: '😊', status: '기뻐하는 중' },
-        'sad': { emoji: '😢', status: '슬퍼하는 중' },
-        'angry': { emoji: '😠', status: '화나는 중' },
-        'surprised': { emoji: '😲', status: '놀라는 중' },
-        'laugh': { emoji: '😂', status: '웃는 중' },
-        'sleep': { emoji: '😴', status: '잠자는 중' },
-        'wakeup': { emoji: '⏰', status: '깨어나는 중' },
-        'shy': { emoji: '😳', status: '부끄러워하는 중' },
-        'touch': { emoji: '👆', status: '터치 반응' }
-    };
+    function getActionEffects() {
+        return {
+            'thinking': { emoji: '💭', status: t('status_thinking') },
+            'happy': { emoji: '😊', status: t('status_happy') },
+            'sad': { emoji: '😢', status: t('status_sad') },
+            'angry': { emoji: '😠', status: t('status_angry') },
+            'surprised': { emoji: '😲', status: t('status_surprised') },
+            'laugh': { emoji: '😂', status: t('status_laugh') },
+            'sleep': { emoji: '😴', status: t('status_sleep') },
+            'wakeup': { emoji: '⏰', status: t('status_wakeup') },
+            'shy': { emoji: '😳', status: t('status_shy') },
+            'touch': { emoji: '👆', status: t('status_touch') }
+        };
+    }
 
     // 모션 그룹과 인덱스 매핑 (커스텀 index.json 기준)
     // 행동 명칭과 모션 그룹이 1:1로 매핑됨
@@ -474,7 +530,7 @@
 
         // Try local files first
         try {
-            avatarLoading.querySelector('div:last-child').textContent = '로컬 모델 로딩 중...';
+            avatarLoading.querySelector('div:last-child').textContent = t('live2d_local_loading');
             live2dModel = await loadModelWithRetry(MODEL_URLS.local, 1, 500);
             setupModel(live2dModel);
             pixiApp.stage.addChild(live2dModel);
@@ -487,7 +543,7 @@
 
         // Fallback to CDN
         try {
-            avatarLoading.querySelector('div:last-child').textContent = 'CDN에서 모델 로딩 중...';
+            avatarLoading.querySelector('div:last-child').textContent = t('live2d_cdn_loading');
             live2dModel = await loadModelWithRetry(MODEL_URLS.cdn, 2, 1500);
             setupModel(live2dModel);
             pixiApp.stage.addChild(live2dModel);
@@ -497,9 +553,9 @@
         } catch (cdnError) {
             console.error('All model sources failed:', cdnError);
             avatarLoading.innerHTML = `
-                <div style="color: var(--error); font-weight: 600;">Live2D 로딩 실패</div>
+                <div style="color: var(--error); font-weight: 600;">${t('live2d_failed')}</div>
                 <div style="font-size: 12px; margin-top: 8px; color: var(--gray-600);">
-                    네트워크 연결을 확인하거나<br>페이지를 새로고침 해주세요
+                    ${t('live2d_retry_msg')}
                 </div>
                 <button onclick="location.reload()" style="
                     margin-top: 12px;
@@ -510,7 +566,7 @@
                     border-radius: var(--radius-md);
                     cursor: pointer;
                     font-size: 13px;
-                ">새로고침</button>
+                ">${t('refresh')}</button>
             `;
         }
     }
@@ -559,7 +615,7 @@
         messageDiv.className = `message ${role}`;
         const label = document.createElement('span');
         label.className = 'message-label';
-        label.textContent = role === 'user' ? '나' : 'AI';
+        label.textContent = role === 'user' ? t('me') : t('ai');
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
         if (rendered) {
@@ -584,6 +640,7 @@
         
         if (actions && actions.length > 0) {
             isAnimating = true;
+            const actionEffects = getActionEffects();
             
             actions.forEach((action, index) => {
                 const timeoutId = setTimeout(() => {
@@ -596,7 +653,7 @@
                     if (index === actions.length - 1) {
                         setTimeout(() => {
                             if (isAnimating) {
-                                avatarStatusText.textContent = '대기 중';
+                                avatarStatusText.textContent = t('status_waiting');
                                 isAnimating = false;
                             }
                         }, 2000);
@@ -617,7 +674,7 @@
         conversationHistory.push({ role: 'user', content: message });
         loading.classList.add('show');
         
-        avatarStatusText.textContent = '생각하는 중...';
+        avatarStatusText.textContent = t('status_thinking');
         triggerLive2DAction('thinking');
         
         try {
@@ -638,24 +695,24 @@
                     window.location.href = data.redirect;
                     return;
                 }
-                addMessage('assistant', '오류: ' + data.error);
+                addMessage('assistant', t('error_occurred') + data.error);
                 triggerLive2DAction('sad');
-                avatarStatusText.textContent = '오류 발생';
+                avatarStatusText.textContent = t('status_error');
             } else {
                 addMessage('assistant', data.response, data.rendered);
                 conversationHistory.push({ role: 'assistant', content: data.response });
                 if (data.actions && data.actions.length > 0) {
                     applyAvatarEffect(data.actions);
                 } else {
-                    avatarStatusText.textContent = '대기 중';
+                    avatarStatusText.textContent = t('status_waiting');
                 }
             }
         } catch (error) {
-            addMessage('assistant', '오류가 발생했습니다: ' + error.message);
+            addMessage('assistant', t('error_occurred') + error.message);
             triggerLive2DAction('sad');
-            avatarStatusText.textContent = '오류 발생';
+            avatarStatusText.textContent = t('status_error');
             setTimeout(() => {
-                avatarStatusText.textContent = '대기 중';
+                avatarStatusText.textContent = t('status_waiting');
             }, 3000);
         } finally {
             loading.classList.remove('show');
